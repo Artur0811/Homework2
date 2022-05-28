@@ -25,3 +25,13 @@ def name(le):
     ast += random.choice(ascii_uppercase[:len(ascii_uppercase) // 2])
     ast += "".join(random.choices(ascii_lowercase, k=b))
     return ast
+
+def little_green_men_names(m,n):
+    rez = []
+    while len(rez)!= m:
+        a = name(n)
+        if a not in rez:
+            rez.append(a)
+    return rez
+
+print(*little_green_men_names(10, 12), sep="\n")
