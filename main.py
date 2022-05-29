@@ -10,20 +10,22 @@ def name(le):
         a = random.randrange(1, le-2)
         b = le-a-3
 
-    c = False
-    while True:
-        m = random.choices(''.join(ascii_letters) + ''.join(digits), k=a)
-
-        for i in range(len(digits)):
-            if digits[i] in m:
-                c = True
-                break
-        if c:
-            break
-    ast += "".join(m)
+    while a > 0:
+        m = random.choice(''.join(ascii_letters) + ''.join(digits))
+        if m not in ast:
+            a-=1
+            ast+=m
     ast += " "
-    ast += random.choice(ascii_uppercase[:len(ascii_uppercase) // 2])
-    ast += "".join(random.choices(ascii_lowercase, k=b))
+    while True:
+        a = random.choice(ascii_uppercase[:len(ascii_uppercase) // 2])
+        if a not in ast:
+            ast+=a
+            break
+    while b > 0:
+        m = random.choice(''.join(ascii_letters) + ''.join(digits))
+        if m not in ast:
+            b-=1
+            ast+=m
     return ast
 
 def little_green_men_names(m,n):
