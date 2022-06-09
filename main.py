@@ -1,20 +1,9 @@
 from PIL import Image
-def color_gradient(name, cor, kind = "lineal", color = "r"):
-    if kind == "lineal":
-        img =Image.linear_gradient("L")
-    else:
-        img = Image.radial_gradient("L")
-    img = img.crop(cor)
-    x, y = img.size[0], img.size[1]
-    img = img.convert(mode="RGB")
-    new = img.load()
-    for i in range(x):
-        for j in range(y):
-            if color.lower() == "r":
-                new[i, j] = (new[i, j][0], 0, 0)
-            elif color.lower() == "g":
-                new[i, j] = (0, new[i, j][0], 0)
-            else:
-                new[i, j] = (0, 0, new[i, j][0])
-    img.save(name)
-color_gradient(r"gradi.jpg", (0, 0, 250, 200), color='G', kind= "radial")
+def snow_forest(cor, pr):
+    img1 = Image.open("forest.png")
+    img2 = Image.open("snow.png").resize((100, 100))
+    img3 = img1.crop(cor+(cor[0]+100, cor[1]+100))
+    img3 = Image.blend(img3, img2, pr)
+    img1.paste(img3, box = (cor))
+    img1.save("output.png")
+snow_forest((100, 100), 0.0)
