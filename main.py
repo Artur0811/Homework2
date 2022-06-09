@@ -1,19 +1,20 @@
 from PIL import Image
-def frame(image, width):
-    img = Image.open(image)
-    x, y = img.size[0]//3,img.size[1]//3
-    new = img.crop((x, y, x*2, y*2))
-    newl = new.load()
-    r, g, b =0, 0,0
+def color_gradient(name, cor, kind = "lineal", color = "r"):
+    if kind == "lineal":
+        img =Image.linear_gradient("L")
+    else:
+        img = Image.radial_gradient("L")
+    img = img.crop(cor)
+    x, y = img.size[0], img.size[1]
+    img = img.convert(mode="RGB")
+    new = img.load()
     for i in range(x):
         for j in range(y):
-            r += newl[i, j][0]
-            g += newl[i, j][1]
-            b += newl[i, j][2]
-    r = r//(x*y)
-    g = g//(x*y)
-    b = b//(x*y)
-    new1 = Image.new(mode = "RGB", size = (x+width*2, y+width*2), color = (r, g, b))
-    new1.paste(new, box=(width, width))
-    new1.save("done.png")
-frame(r"foto.jpg", 40)
+            if color.lower() == "r":
+                new[i, j] = (new[i, j][0], 0, 0)
+            elif color.lower() == "g":
+                new[i, j] = (0, new[i, j][0], 0)
+            else:
+                new[i, j] = (0, 0, new[i, j][0])
+    img.save(name)
+color_gradient(r"gradi.jpg", (0, 0, 250, 200), color='G', kind= "radial")
