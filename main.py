@@ -1,9 +1,9 @@
-from PIL import Image
-def snow_forest(cor, pr):
-    img1 = Image.open("forest.png")
-    img2 = Image.open("snow.png").resize((100, 100))
-    img3 = img1.crop(cor+(cor[0]+100, cor[1]+100))
-    img3 = Image.blend(img3, img2, pr)
-    img1.paste(img3, box = (cor))
-    img1.save("output.png")
-snow_forest((100, 100), 0.0)
+from pymorphy2 import MorphAnalyzer
+def russian_noun(word, case = "nomn", number = "sing"):
+    w = MorphAnalyzer().parse(word)[0].inflect({case, number}).word
+    return w
+for case in ["nomn",'gent','datv','accs','ablt','loct','voct']:
+    print(russian_noun("свечки", case=case))
+print("------------------")
+for case in ["nomn",'gent','datv','accs','ablt','loct','voct']:
+    print(russian_noun("свечки", case=case, number="plur"))
