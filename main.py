@@ -1,9 +1,33 @@
-from pymorphy2 import MorphAnalyzer
-def russian_noun(word, case = "nomn", number = "sing"):
-    w = MorphAnalyzer().parse(word)[0].inflect({case, number}).word
-    return w
-for case in ["nomn",'gent','datv','accs','ablt','loct','voct']:
-    print(russian_noun("свечки", case=case))
-print("------------------")
-for case in ["nomn",'gent','datv','accs','ablt','loct','voct']:
-    print(russian_noun("свечки", case=case, number="plur"))
+from PIL import Image,ImageDraw
+def human(colf, colline, m, width):
+    x, y = m[0], m[1]
+    img = Image.new("RGB", (x*16, y*21), colf)
+    dr = ImageDraw.Draw(img)
+    dr.line(((5 * x, 20 * y), (7 * x, 20 * y)), width=width, fill=colline)
+    dr.line(((5 * x, 20 * y), (6 * x, 15 * y)), width=width, fill=colline)
+    dr.line(((8 * x, 11 * y), (6 * x, 15 * y)), width=width, fill=colline)
+    dr.line(((8 * x, 11 * y), (11 * x, 10 * y)), width=width, fill=colline)
+    dr.line(((11 * x, 10 * y), (13 * x, 15 * y)), width=width, fill=colline)
+    dr.line(((13 * x, 15 * y), (15 * x, 14 * y)), width=width, fill=colline)
+    dr.line(((8 * x, 11 * y), (8 * x, 5 * y)), width=width, fill=colline)
+    dr.line(((7 * x, 6 * y), (9 * x, 6 * y)), width=width, fill=colline)
+    dr.line(((9 * x, 6 * y), (12 * x, 10 * y)), width=width, fill=colline)
+    dr.line(((12 * x, 10 * y), (15 * x, 7 * y)), width=width, fill=colline)
+    dr.line(((7 * x, 6 * y), (4 * x, 10 * y)), width=width, fill=colline)
+    dr.line(((4 * x, 10 * y), (6 * x, 13 * y)), width=width, fill=colline)
+    dr.ellipse(((5 * x - int(x * 0.2), 20 * y - int(x * 0.2)), (5 * x + int(x * 0.2), 20 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((6 * x - int(x * 0.2), 15 * y - int(x * 0.2)), (6 * x + int(x * 0.2), 15 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((4 * x - int(x * 0.2), 10 * y - int(x * 0.2)), (4 * x + int(x * 0.2), 10 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((8 * x - int(x * 0.2), 11 * y - int(x * 0.2)), (8 * x + int(x * 0.2), 11 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((7 * x - int(x * 0.2), 6 * y - int(x * 0.2)), (7 * x + int(x * 0.2), 6 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((9 * x - int(x * 0.2), 6 * y - int(x * 0.2)), (9 * x + int(x * 0.2), 6 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((12 * x - int(x * 0.2), 10 * y - int(x * 0.2)), (12 * x + int(x * 0.2), 10 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((11 * x - int(x * 0.2), 10 * y - int(x * 0.2)), (11 * x + int(x * 0.2), 10 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((13 * x - int(x * 0.2), 15 * y - int(x * 0.2)), (13 * x + int(x * 0.2), 15 * y + int(x * 0.2))),width=width, outline=colline)
+    dr.ellipse(((int(6.5*x), int(1.5*y)), (int(9.5*x), int(4.5*y))),width=width, outline=colline)
+    dr.polygon(((6*x, y), (6*x, int(4.5*y)), (8*x, int(2.5*y)), (10*x, int(4.5*y)), (10*x, y)), fill=colf)
+    dr.ellipse(((int(6 * x), int(1 * y)), (int(10 * x), int(5 * y))), width=width, outline=colline)
+    dr.ellipse(((7 * x - int(x * 0.2), 3 * y - int(x * 0.2)), (7 * x + int(x * 0.2), 3 * y + int(x * 0.2))),width=width, fill=colline)
+    dr.ellipse(((9 * x - int(x * 0.2), 3 * y - int(x * 0.2)), (9 * x + int(x * 0.2), 3 * y + int(x * 0.2))),width=width, fill=colline)
+    img.save("human.png")
+human((255, 255, 255), (0,0,0),(20, 20), 3)
