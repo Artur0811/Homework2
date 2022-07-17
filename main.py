@@ -1,95 +1,79 @@
-print("Тип 19 № 28083")
-def f(x, h):
-    if h > 3 or x >= 26:
-        return h == 3
-    return f(x+1, h+1) or f(x*2, h+1)
-for i in range(1, 26):
-    if f(i, 1):
-        print(i)
-        break
-print("Тип 20 № 28084")
-def f1(x, h):
-    if h > 4 or x >= 26:
-        return h == 4
-    if h %2 == 0:
-        return f1(x+1, h+1) and f1(x*2, h+1)
-    else:
-        return f1(x+1, h+1) or f1(x*2, h+1)
-for i in range(1, 26):
-    if f1(i, 1):
-        print(i)
-print("Тип 21 № 28085")
-def f2(x, h):
-    if x>= 26 and (h == 5 or h==3):
-        return True
-    if h > 5 or (x>= 26 and (h == 2 or h==4)):
-        return False
-    if h%2 == 1:
-        return f2(x+1, h+1) and f2(x*2, h+1)
-    return f2(x+1, h+1) or f2(x*2, h+1)
-for i in range(1, 26):
-    if f2(i, 1):
-        print(i)
-print("Тип 20 № 27763")
-def f4(x, y, h):
-    if x+y >= 47 or h > 4:
-        return h == 4
-    if h %2== 0:
-        return f4(x+1, y+2, h+1) and  f4(x+2, y+1, h+1) and  f4(x*2, y, h+1) and  f4(x, y*2, h+1)
-    return f4(x+1, y+2, h+1) or f4(x+2, y+1, h+1) or f4(x * 2, y, h + 1) or f4(x, y * 2, h + 1)
-ma = 0
-for i in range(1, 37):
-    if f4(10, i, 1):
-        ma = i
-print(ma)
-print("Тип 21 № 27764")
-def f5(x, y, h):
-    if x+y >= 47 and (h==5 or h == 3):
-        return True
-    if (x+y >= 47 and (h==4 or h == 2)) or h > 5:
-        return False
-    if h%2 == 1:
-        return f5(x+1, y+2, h+1) and  f5(x+2, y+1, h+1) and  f5(x*2, y, h+1) and  f5(x, y*2, h+1)
-    return f5(x+1, y+2, h+1) or f5(x+2, y+1, h+1) or f5(x * 2, y, h + 1) or f5(x, y * 2, h + 1)
-for i in range(1, 36):
-    if f5(10, i, 1):
-        print(i)
-        break
-print("Тип 19 № 27777")
-def f6(x, y, h):
-    if x+y<=40 or h>3:
-        return h == 3
-    return f6(x-1, y, h+1) or f6(x, y-1, h+1) or f6(x-(x//2), y, h+1) or f6(x, y-(y//2), h+1)
-ma= 0
-for i in range(21, 100):
-    if f6(20, i, 1):
-        ma = i
-print(ma)
-print("Тип 20 № 27778 ")
-k = 0
-def f7(x, y, h):
-    if x+y<= 40 or h>4:
-        return h == 4
-    if h %2==0:
-        return f7(x-1, y, h+1) and f7(x, y-1, h+1) and f7(x-(x//2), y, h+1) and f7(x, y-(y//2), h+1)
-    return f7(x - 1, y, h + 1) or f7(x, y - 1, h + 1) or f7(x - (x // 2), y, h + 1) or f7(x, y - (y // 2), h + 1)
-for i in range(21, 100):
-    if f7(20, i, 1):
-        print(i)
-        k+=1
-    if k == 3:
-        break
-print("Тип 21 № 27779 ")
-def f8(x, y, h):
-    if x+y<= 40 and (h == 3 or h == 5):
-        return True
-    if (x+y<= 40 and (h == 2 or h == 4)) or h > 5:
-        return False
-    if h%2 == 1:
-        return f8(x - 1, y, h + 1) and f8(x, y - 1, h + 1) and f8(x - (x // 2), y, h + 1) and f8(x, y - (y // 2), h + 1)
-    return f8(x - 1, y, h + 1) or f8(x, y - 1, h + 1) or f8(x - (x // 2), y, h + 1) or f8(x, y - (y // 2), h + 1)
-ma = 0
-for i in range(21, 1000):
-    if f8(20, i , 1):
-        ma = i
-print(ma)
+def Pmatrix(x, y):
+  m = [[0 for i in range(len(x))] for i in range(len(x))]
+  for i in range(len(x)):
+    for z in range(len(y)):
+      for h in range(len(y)):
+        m[i][z] += x[i][h]*y[h][z]
+  return m
+
+def Smatrix(x, y):
+  for i in range(len(x)):
+    for z in range(len(y)):
+      x[i][z]+=y[i][z]
+  return x
+
+def d(x):
+  m1, m2, m3, m4, l = [], [], [], [], len(x[0])
+  for i in range(l):
+    m2.append(x[i][l // 2:])
+    m1.append(x[i][:l // 2])
+  m3 = m1[len(m1) // 2:]
+  m1 = m1[:len(m1) // 2]
+  m4 = m2[len(m2) // 2:]
+  m2 = m2[:len(m2) // 2]
+  return [m1, m2, m3, m4]
+
+def rek(x ,y):
+  if len(x) > 2:
+    x = d(x)
+    y = d(y)
+    return skleyka([Smatrix(rek(x[0], y[0]), rek(x[1], y[2])),  Smatrix(rek(x[0], y[1]), rek(x[1], y[3])),  Smatrix(rek(x[2], y[0]), rek(x[3], y[2])),Smatrix(rek(x[2], y[1]), rek(x[3], y[3]))])
+  else:
+    return Pmatrix(x, y)
+
+def skleyka(x):
+  m = []
+  for i in range(len(x[0])):
+    m.append(x[0][i] + x[1][i])
+  for i in range(len(x[0])):
+    m.append(x[2][i] + x[3][i])
+  return m
+
+k = [[1, 2, 3, 4],
+     [5, 2, 6, 4],
+     [1, 7, 9, 8],
+     [0, 12, 4, 4]]
+b = [[3, 5, 3, 7],
+     [8, 112, 23, 4],
+     [1, 34, 9, 567],
+     [0, 12, 0, 4]]
+
+
+k = [[1, 0],
+     [0,1]]
+b = [[1,1],
+     [3, 5]]
+
+
+k = [[2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1]]
+b = [[2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [2, 2, 2, 2, 0, 0, 0, 0],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1]]
+r = rek(k,b)
+for i in r:
+  print(i)
+p = Pmatrix(k,b)
+for i in p:
+  print(i)
