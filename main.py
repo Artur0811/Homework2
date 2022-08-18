@@ -1,243 +1,90 @@
-#27 задача
-def n27(name):
-    with open(name) as f:
-        n = f.readline()
-        a= list(map(int, f))
-    a = list(map(lambda x:x*3, a))
-    sl, sr =0,0
-    p=0
-    mi =9999999999999999999999999999999999999999999999999999999
-    for i in range((len(a)-1)//2):
-        p+=1
-        sr+=a[p]
-        sl+=a[-p]
-    if (len(a)-1)%2 == 1:
-        p+=1
-        sr+=a[p]
-    a0l = 0
-    a0r = 0
-    p=0
-    for i in range((len(a)-1)//2):
-        p+=1
-        a0r+=p*a[p]
-        a0l+=p*a[-p]
-    if (len(a)-1)%2 == 1:
-        p+=1
-        a0r+=(p)*a[p]
-    for i in range(1,len(a)):
-        a0r-=sr
-        if i+p < len(a):
-            a0r+=p * a[i+p]
-            sr+=a[i+p]
+from PIL import Image, ImageDraw
+
+def d(p1, p2):
+    x = p1[0] - p2[0]
+    y = p1[1] - p2[1]
+    return (x ** 2 + y ** 2) ** 0.5
+
+
+def ClosestSplitPair(px, py, dist, best_pair):
+    xs = px[len(px) // 2][0]
+    Sy = list(filter(lambda x: xs - dist <= x[0] <= xs + dist, py))
+    best_d = dist
+    best_p = best_pair
+    for i in range(len(Sy) - 1):
+        for j in range(i + 1, min(i + 7, len(Sy))):
+            p, q = Sy[i], Sy[j]
+            if d(p, q) < best_d:
+                best_p = p, q
+                best_d = d(p, q)
+    return best_p[0],best_p[1],best_d
+
+
+def p(data):
+    best_d = d(data[0], data[1])
+    best_p = data[0], data[1]
+    for i in range(len(data)):
+        for j in range(i + 1, len(data)):
+            p, q = data[i], data[j]
+            if d(p, q) < best_d:
+                best_p = p, q
+                best_d = d(p, q)
+    return best_p[0],best_p[1],best_d
+
+
+def ClosestPair(px, py):
+    if len(px) <= 3:
+        return p(px)
+    Qx = px[len(px) // 2:]
+    Rx = px[:len(px) // 2]
+    Qy = []
+    Ry = []
+    for i in range(len(py)):
+        if px[len(px) // 2][0] <= py[i][0]:
+            Qy.append(py[i])
         else:
-            a0r += p * a[i + p- len(a)]
-            sr += a[i + p-len(a)]
-        sr-=a[i]
-        sl+=a[i-1]
-        a0l+=sl
-        sl-=a[i-p]
-        a0l-=p*a[i-p]
-        if a0l+a0r<mi:
-            mi = a0l+a0r
-            k = i
-    return mi
-print(n27("107_27_A.txt"))#471228
-print(n27("107_27_B.txt"))#49113954961677
-
-
-#Алгоритм Штрассена
-def Pmatrix(x, y):
-  m = []
-  p1 = x[0][0]*(y[0][1] - y[1][1])
-  p2 = (x[0][0]+x[0][1])*y[1][1]
-  p3 = (x[1][0]+x[1][1])*y[0][0]
-  p4 = (y[1][0]-y[0][0])*x[1][1]
-  p5 = (x[0][0]+x[1][1])*(y[0][0]+y[1][1])
-  p6 = (x[0][1]-x[1][1])*(y[1][0]+y[1][1])
-  p7 = (x[0][0]-x[1][0])*(y[0][0]+y[0][1])
-  m.append([p5+p4-p2+p6, p1+p2])
-  m.append([p3+p4, p1+p5-p3-p7])
-  return m
-
-def Smatrix(x, y):
-  for i in range(len(x)):
-    for z in range(len(y)):
-      x[i][z]+=y[i][z]
-  return x
-
-def d(x):
-  m1, m2, m3, m4, l = [], [], [], [], len(x[0])
-  for i in range(l):
-    m2.append(x[i][l // 2:])
-    m1.append(x[i][:l // 2])
-  m3 = m1[len(m1) // 2:]
-  m1 = m1[:len(m1) // 2]
-  m4 = m2[len(m2) // 2:]
-  m2 = m2[:len(m2) // 2]
-  return [m1, m2, m3, m4]
-
-def rek(x ,y):
-  if len(x) > 2:
-    x = d(x)
-    y = d(y)
-    return skleyka([Smatrix(rek(x[0], y[0]), rek(x[1], y[2])),  Smatrix(rek(x[0], y[1]), rek(x[1], y[3])),  Smatrix(rek(x[2], y[0]), rek(x[3], y[2])),Smatrix(rek(x[2], y[1]), rek(x[3], y[3]))])
-  else:
-    return Pmatrix(x, y)
-
-def skleyka(x):
-  m = []
-  for i in range(len(x[0])):
-    m.append(x[0][i] + x[1][i])
-  for i in range(len(x[0])):
-    m.append(x[2][i] + x[3][i])
-  return m
-
-k = [[1, 2, 3, 4],
-     [5, 2, 6, 4],
-     [1, 7, 9, 8],
-     [0, 12, 4, 4]]
-b = [[3, 5, 3, 7],
-     [8, 112, 23, 4],
-     [1, 34, 9, 567],
-     [0, 12, 0, 4]]
-
-
-k = [[1, 0],
-     [0,1]]
-b = [[1,1],
-     [3, 5]]
-
-
-k = [[2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1]]
-b = [[2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1]]
-r = rek(k,b)
-for i in r:
-  print(i)
-
-#№26
-with open ("26 (1).txt") as f :
-    n = f.readline()
-    a = []
-    for i in f:
-        a.append(list(map(int, i.split())))
-r = []
-s = 0
-for i in range(len(a)):
-    if a[i][0]<=1634515200 and a[i][1]>1634515200 or a[i][0]<=1634515200 and a[i][1]==0:
-        s+=1
-    if 1634515200 < a[i][0]< 1634515200+7*24*3600:
-        r.append([a[i][0], 0])
-    if 1634515200 < a[i][1]< 1634515200+7*24*3600:
-        r.append([a[i][1], 1])
-r=sorted(r, key=lambda x:x[0])
-sm = s
-t = 0
-for i in range(len(r)):
-    if r[i][1] == 0:
-        s+=1
-        tn = r[i][0]
+            Ry.append(py[i])
+    p1, q1, d1 = ClosestPair(Qx, Qy)
+    p2, q2, d2 = ClosestPair(Rx, Ry)
+    dist = min((p1, q1, d1), (p2, q2, d2), key=lambda x: x[2])
+    p3, q3, d3 = ClosestSplitPair(px, py, dist[2], (dist[0], dist[1]))
+    x, y, z = d(p1, q1), d(p2, q2), d(p3, q3)
+    if x < y and x < z:
+        return p1, q1, x
+    elif y < x and y < z:
+        return p2, q2, y
     else:
-        s-=1
-    if sm < s:
-        sm = s
-        if i+1 != len(r):
-            if r[i+1][1] == 1:
-                t= r[i+1][0] - tn
-        else:
-            t = 1634515200+7*24*3600-tn
-print(sm, t)
+        return p3, q3, z
 
-#перемножение матриц
-def Pmatrix(x, y):
-  m = [[0 for i in range(len(x))] for i in range(len(x))]
-  for i in range(len(x)):
-    for z in range(len(y)):
-      for h in range(len(y)):
-        m[i][z] += x[i][h]*y[h][z]
-  return m
+def map(m):
+    ma_ = 0
+    for i in range (len(m)):
+        if abs(m[i][0])  > ma_:
+            ma_ = abs(m[i][0])
+        elif abs(m[i][1])  > ma_:
+            ma_ = abs(m[i][1])
+    ma_+=20
+    x = 1000//ma_
+    c = x * ma_
+    p = Image.new("RGB", (c * 2, c * 2), (255, 255, 255))
+    dr = ImageDraw.Draw(p)
+    dr.line(((c, 0),(c, c*2)), width=1, fill=(0,0,0))
+    dr.line(((0, c), (c*2, c)), width=1, fill=(0, 0, 0))
+    for i in range(len(m)):
+        x1,y1, x2, y2 = c+m[i][0]*x-(x//2), c-m[i][1]*x-(x//2), c+m[i][0]*x+(x//2),c-m[i][1]*x+(x//2)
+        dr.ellipse(((x1, y1), (x2, y2)),width=1, fill=(0,0,0))
+    for i in range(1, ma_-1):
+        x0,  x1 = c+i*x,  c-i*x
+        dr.line(((x0, c-x), (x0, c +x)), width=1, fill=(0, 0, 0))
+        dr.line(((x1, c - x), (x1, c + x)), width=1, fill=(0, 0, 0))
+        dr.line(((c - x, x0), (c+x, x0)), width=1, fill=(0, 0, 0))
+        dr.line(((c - x, x1), (c + x, x1)), width=1, fill=(0, 0, 0))
+    p.save("map.png")
 
-def Smatrix(x, y):
-  for i in range(len(x)):
-    for z in range(len(y)):
-      x[i][z]+=y[i][z]
-  return x
-
-def d(x):
-  m1, m2, m3, m4, l = [], [], [], [], len(x[0])
-  for i in range(l):
-    m2.append(x[i][l // 2:])
-    m1.append(x[i][:l // 2])
-  m3 = m1[len(m1) // 2:]
-  m1 = m1[:len(m1) // 2]
-  m4 = m2[len(m2) // 2:]
-  m2 = m2[:len(m2) // 2]
-  return [m1, m2, m3, m4]
-
-def rek(x ,y):
-  if len(x) > 2:
-    x = d(x)
-    y = d(y)
-    return skleyka([Smatrix(rek(x[0], y[0]), rek(x[1], y[2])),  Smatrix(rek(x[0], y[1]), rek(x[1], y[3])),  Smatrix(rek(x[2], y[0]), rek(x[3], y[2])),Smatrix(rek(x[2], y[1]), rek(x[3], y[3]))])
-  else:
-    return Pmatrix(x, y)
-
-def skleyka(x):
-  m = []
-  for i in range(len(x[0])):
-    m.append(x[0][i] + x[1][i])
-  for i in range(len(x[0])):
-    m.append(x[2][i] + x[3][i])
-  return m
-
-k = [[1, 2, 3, 4],
-     [5, 2, 6, 4],
-     [1, 7, 9, 8],
-     [0, 12, 4, 4]]
-b = [[3, 5, 3, 7],
-     [8, 112, 23, 4],
-     [1, 34, 9, 567],
-     [0, 12, 0, 4]]
-
-
-k = [[1, 0],
-     [0,1]]
-b = [[1,1],
-     [3, 5]]
-
-
-k = [[2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1]]
-b = [[2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [2, 2, 2, 2, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1]]
-r = rek(k,b)
-for i in r:
-  print(i)
-p = Pmatrix(k,b)
-for i in p:
-  print(i)
+m = [(3, 4), (0, 1),(9, 99),(3, 100),(3, 5),(16, 4),(-5, 4),(-5, -20)]
+print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
+m = [(-3, 5), (0, 0),(-21, -7),(-32, 99),(-3, -5),(0, 7),(-65, 4),(-65, -20),(23, 24), (23, 1),(19, 9),(7, -9),(13, 5),(16, -4),(51, -84),(45, 120)]
+print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
+m = [(0, 5), (5, 0),(10, 10),(-10, -10),(-23, -25),(20, -17),(-15, -20),(-25, -20),(0, 1), (23, 1),(19, 91),(7, -91),(13, 15),(19, -14),(51, -84),(54, -83),(5-6, 102),(51, 1),(45, 1)]
+print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
+map(m)
