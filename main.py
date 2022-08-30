@@ -1,90 +1,277 @@
-from PIL import Image, ImageDraw
+import docx
+def n1_1(a, P):
 
-def d(p1, p2):
-    x = p1[0] - p2[0]
-    y = p1[1] - p2[1]
-    return (x ** 2 + y ** 2) ** 0.5
+    def ob(p, np, pos):
+        b = a[p]
+        l = np[p]
+        nex = ""
+        mi = 99999
+        for i in range(len(b)):
+            if np[b[i][0]] > l+int(b[i][1:]):
+                np[b[i][0]] = l+int(b[i][1:])
+            if l+int(b[i][1:]) < mi and b[i][0] not in pos:
+                mi = l+int(b[i][1:])
+                nex = b[i][0]
+        pos+=p
+        return nex, np, pos
 
-
-def ClosestSplitPair(px, py, dist, best_pair):
-    xs = px[len(px) // 2][0]
-    Sy = list(filter(lambda x: xs - dist <= x[0] <= xs + dist, py))
-    best_d = dist
-    best_p = best_pair
-    for i in range(len(Sy) - 1):
-        for j in range(i + 1, min(i + 7, len(Sy))):
-            p, q = Sy[i], Sy[j]
-            if d(p, q) < best_d:
-                best_p = p, q
-                best_d = d(p, q)
-    return best_p[0],best_p[1],best_d
-
-
-def p(data):
-    best_d = d(data[0], data[1])
-    best_p = data[0], data[1]
-    for i in range(len(data)):
-        for j in range(i + 1, len(data)):
-            p, q = data[i], data[j]
-            if d(p, q) < best_d:
-                best_p = p, q
-                best_d = d(p, q)
-    return best_p[0],best_p[1],best_d
+    def deykstra(x, y, pos = ""):
+        np = {x:0}
+        nps = x
+        for i in a:
+            if i not in nps:
+                np[i] = 9999
+                nps+= i
+        n = x
+        while n !="":
+            b = ob(n, np, pos)
+            np = b[1]
+            n = b[0]
+            pos = b[2]
 
 
-def ClosestPair(px, py):
-    if len(px) <= 3:
-        return p(px)
-    Qx = px[len(px) // 2:]
-    Rx = px[:len(px) // 2]
-    Qy = []
-    Ry = []
-    for i in range(len(py)):
-        if px[len(px) // 2][0] <= py[i][0]:
-            Qy.append(py[i])
+        return np[y], pos[:pos.find(y)+1]
+
+    k = 0
+    p = ""
+    for i in range(len(P)):
+        b = deykstra(*P[i], p)
+        k+=b[0]
+        p = b[1]
+    print(k)
+
+n1_1({"A": ["B2", "C9", "D4"], "B":["A2",'C3',"E5"], "C":["A9","B2","D6","E10"], "D":["A4","C6","E8"], "E":["B5","C10","D8"]}, [["A", "C"], ["C", "E"]])#нет
+def n1_2(a, P):
+
+    def ob(p, np, pos):
+        b = a[p]
+        l = np[p]
+        nex = ""
+        mi = 99999
+        for i in range(len(b)):
+            if np[b[i][0]] > l+int(b[i][1:]):
+                np[b[i][0]] = l+int(b[i][1:])
+            if l+int(b[i][1:]) < mi and b[i][0] not in pos:
+                mi = l+int(b[i][1:])
+                nex = b[i][0]
+        pos+=p
+        return nex, np, pos
+
+    def deykstra(x, y):
+        pos = ""
+        np = {x:0}
+        nps = x
+        for i in a:
+            if i not in nps:
+                np[i] = 9999
+                nps+= i
+        n = x
+        while n !="":
+            b = ob(n, np, pos)
+            np = b[1]
+            n = b[0]
+            pos = b[2]
+
+        return np[y]
+
+    k = 0
+    for i in range(len(P)):
+        k+=deykstra(*P[i])
+    print(k)
+n1_2({"A": ["B1", "C2", "E4"], "B":["A1",'C4'], "C":["A2","B4","E1"], "D":["E4"], "E":["A4","C1","D4"]}, [["B", "D"]])#верно
+
+def n2():
+    for x in range(2):
+        for y in range(2):
+            for z in range(2):
+                for w in range(2):
+                    if (not(y <= (x == w)) and (z<=x)) == 1:
+                        print(x,y,z,w)
+#0111
+#0110
+#1010
+#ответ wxyz
+
+def n4():
+    a = "АБВГДЕИН"
+    b = {"A":"110", "Б":"01", "И":"000"}
+    s = "ВВЕДЕНИЕ"
+    def Fano(k):
+        m = ["0", "1"]
+        l = 1
+        while k != l:
+            for i in range(len(m)):
+                if len(m[i]) == l:
+                    m.append(m[i]+"0")
+                    m.append(m[i]+"1")
+            l+=1
+        return m
+    def free(a, b):
+        rez = []
+        c = []
+        for i in a:
+            for y in range(1, len(a[i])+1):
+                c.append(a[i][:y])
+        for i in range(len(b)):
+            if b[i] not in c:
+                t = True
+                for z in a:
+                    if len(a[z]) < len(b[i]):
+                        if a[z] == b[i][:len(a[z])]:
+                            t = False
+                if t:
+                    rez.append(b[i])
+        return rez
+    kof = 1
+    while True:
+        m = Fano(kof)
+        r = free(b, m)
+        if len(r)<(len(a) - len(b)):
+            kof+=1
         else:
-            Ry.append(py[i])
-    p1, q1, d1 = ClosestPair(Qx, Qy)
-    p2, q2, d2 = ClosestPair(Rx, Ry)
-    dist = min((p1, q1, d1), (p2, q2, d2), key=lambda x: x[2])
-    p3, q3, d3 = ClosestSplitPair(px, py, dist[2], (dist[0], dist[1]))
-    x, y, z = d(p1, q1), d(p2, q2), d(p3, q3)
-    if x < y and x < z:
-        return p1, q1, x
-    elif y < x and y < z:
-        return p2, q2, y
-    else:
-        return p3, q3, z
+            m = Fano(kof+1)
+            r = free(b, m)
+            break
 
-def map(m):
-    ma_ = 0
-    for i in range (len(m)):
-        if abs(m[i][0])  > ma_:
-            ma_ = abs(m[i][0])
-        elif abs(m[i][1])  > ma_:
-            ma_ = abs(m[i][1])
-    ma_+=20
-    x = 1000//ma_
-    c = x * ma_
-    p = Image.new("RGB", (c * 2, c * 2), (255, 255, 255))
-    dr = ImageDraw.Draw(p)
-    dr.line(((c, 0),(c, c*2)), width=1, fill=(0,0,0))
-    dr.line(((0, c), (c*2, c)), width=1, fill=(0, 0, 0))
-    for i in range(len(m)):
-        x1,y1, x2, y2 = c+m[i][0]*x-(x//2), c-m[i][1]*x-(x//2), c+m[i][0]*x+(x//2),c-m[i][1]*x+(x//2)
-        dr.ellipse(((x1, y1), (x2, y2)),width=1, fill=(0,0,0))
-    for i in range(1, ma_-1):
-        x0,  x1 = c+i*x,  c-i*x
-        dr.line(((x0, c-x), (x0, c +x)), width=1, fill=(0, 0, 0))
-        dr.line(((x1, c - x), (x1, c + x)), width=1, fill=(0, 0, 0))
-        dr.line(((c - x, x0), (c+x, x0)), width=1, fill=(0, 0, 0))
-        dr.line(((c - x, x1), (c + x, x1)), width=1, fill=(0, 0, 0))
-    p.save("map.png")
+def n5():
+    for i in range(100, 1000):
+        a = str(i)
+        b = int(a[0])*int(a[1])
+        c = int(a[1])*int(a[2])
+        m = sorted([b, c])
+        if str(m[0])+str(m[1]) =="621":
+            print(i)
+            break
+#237
+def n6():
+    for i in range(1, 10000):
+        s = i
+        s = s//7
+        n = 1
+        while s<255:
+            if (s+n)%2 == 0:
+                s+=11
+            n = n+5
+        if n == 106:
+            print(i)
+            break
+#175
+def n7():
+    print(1024*1024*4/8/1024)
+#512
+def n8():
+    k = 0
+    for i in "ЛЕВИЙ":
+        for x in "ЛЕВИЙ":
+            for y in "ЛЕВИЙ":
+                for z in "ЛЕВИЙ":
+                    for w in "ЛЕВИЙ":
+                        if i!= "Й" and (i+x+y+z+w).count("Л") < 2 and (i+x+y+z+w).count("Е") < 2 and (i+x+y+z+w).count("В") < 2 and (i+x+y+z+w).count("И") < 2 and (i+x+y+z+w).count("Й") < 2:
+                            if "ЕИ" not in i+x+y+z+w:
+                                k+=1
+    print(k)
+#78
 
-m = [(3, 4), (0, 1),(9, 99),(3, 100),(3, 5),(16, 4),(-5, 4),(-5, -20)]
-print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
-m = [(-3, 5), (0, 0),(-21, -7),(-32, 99),(-3, -5),(0, 7),(-65, 4),(-65, -20),(23, 24), (23, 1),(19, 9),(7, -9),(13, 5),(16, -4),(51, -84),(45, 120)]
-print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
-m = [(0, 5), (5, 0),(10, 10),(-10, -10),(-23, -25),(20, -17),(-15, -20),(-25, -20),(0, 1), (23, 1),(19, 91),(7, -91),(13, 15),(19, -14),(51, -84),(54, -83),(5-6, 102),(51, 1),(45, 1)]
-print(ClosestPair(sorted(m, key=lambda x:x[0]), sorted(m, key=lambda x:x[1])))
-map(m)
+def n10_1():
+    k = 0
+    a = docx.Document("10.docx")
+    par = a.paragraphs
+    for i in par:
+        k += i.text.count("Мой")
+    print(k)
+#5
+def n10_2():#no
+     k = 0
+     a = docx.Document("10_demo.docx")
+     par = a.paragraphs
+     for i in par:
+         k += i.text.lower().count("звук")
+
+     print(k)
+
+#мой - 3 прав - 1
+def n11():
+    a = 8*7//8
+    print(a*110)
+#770
+
+def n12():
+    a = "1"+("9"*100)
+    while "19" in a or "299" in a or "3999" in a:
+        a = a.replace("19", "2", 1)
+        a = a.replace("299", "3", 1)
+        a = a.replace("3999", "1", 1)
+    print(a)
+#39
+
+def n13():
+    a = "АБВГ БВД ВГДЕ ГЕИ ДЕЖК ЕИ ИК ЖКЛ КЛМН ЛН МН".split()
+    b = {i[0]: i[1:] for i in a}
+    def f(x, y):
+        if x == "В":
+            return 0
+        elif x == y:
+            return 1
+        else:
+            k = 0
+            s = b[x]
+            for i in range(len(s)):
+                k+= f(s[i], y)
+            return k
+    print(f("А", "Н"))
+#16
+
+def n14():
+    a = 4*(625**9)-25**15+2*(5**11)- 7
+    b = ""
+    while a>0:
+        b+=str(a%5)
+        a = a//5
+    print(b.count("4"))
+#15
+
+def n15():
+    ma = 0
+    for a in range(100):
+        f = True
+        for x in range(1000):
+            for y in range(1000):
+                if not((2*x+3*y < 30) or (x+y >= a)):
+                    f = False
+        if f:
+            ma = a
+    print(ma)
+#10
+
+def schet():
+    def sum(a, b):
+      return a[1]+b[1]
+
+    def delenie(m, k = 0):
+      if len(m)>1:
+        a = delenie(m[:len(m)//2], k)
+        b = delenie(m[len(m)//2:], k)
+        k+=a[1]
+        k+=b[1]
+        c = sliyanie(a[0], b[0])
+        k+=c[1]
+        return c[0], k
+      else:
+        return m, k
+
+
+    def sliyanie(a, b):
+      k = 0
+      m = []
+      while len(a)> 0 and len(b)>0:
+        if a[0] > b[0]:
+          k+= 1
+          m.append(b[0])
+          b = b[1:]
+        else:
+          m.append(a[0])
+          a = a[1:]
+      m+=a
+      m+=b
+      print(m, k)
+      return m, k
