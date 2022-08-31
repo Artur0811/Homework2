@@ -18,7 +18,7 @@ def schet(vvod):
       m = []
       while len(a)> 0 and len(b)>0:
         if a[0] > b[0]:
-          k+= 1
+          k+= len(a)
           m.append(b[0])
           b = b[1:]
         else:
@@ -28,4 +28,4 @@ def schet(vvod):
       m+=b
       return m, k
     return delenie(vvod)
-print(schet([1, 20, 6, 4, 5]))
+print(schet([9,8, 1,2,3,4]))
