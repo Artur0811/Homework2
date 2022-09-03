@@ -1,73 +1,40 @@
-import random
-import re
-class CardError(Exception):
-    pass
+test = [    "",#-1
+            "(",#1
+            ")",#1
+            "((",#-1
+            "(()",#1
+            "()",#-1
+            "(()())()",#-1
+            "((()",#-1
+            ")(",#-1
+            "d + (a + (b + c) = (a + b) + c + d",#5
+            "()(()=()",#3
+            "() = (()"#6
+]
 
-class CardFormatError(CardError):
-    pass
+a = "123456"
+i = 1
 
-class CardAlgorithmError(CardError):
-    pass
-
-class words_in_number(CardError):
-  pass
-
-class low_len(CardError):
-  pass
-
-class err_server(CardError):
-  pass
-
-class empty_input(CardError):
-  pass
-
-
-
-def get_card_number():
-    card_number = input("Введите номер карты (16 цифр): ")
-    card_number = "".join(card_number.strip().split())
-    if card_number.isdigit() and len(card_number) == 16:
-        return card_number
+def ud(a, k=1):
+    if k == 0:
+        return a
     else:
-      if card_number =="":
-        raise empty_input("Пустой ввод")
-      elif card_number.isalnum():
-        raise words_in_number("Буквы в номере")
-      elif len(card_number)<16:
-        raise low_len("Символов меньше 16")
-      raise CardFormatError('Неверный формат номера')
+        n = 0
+        for i in range(len(a)-1):
+            if a[i][0] == "(" and a[i+1][0] == ")":
+                a = a[:i] + a[i+2:]
+                n+=1
+                break
+        return ud(a, n)
 
-
-def double(x):
-    res = x * 2
-    if res > 9:
-        res = res - 9
-    return res
-
-
-def luhn_algorithm(card):
-    odd = map(lambda x: double(int(x)), card[::2])
-    even = map(int, card[1::2])
-    if (sum(odd) + sum(even)) % 10 == 0:
-        return True
+for a in test:
+    k = []
+    l, r = 0, 0
+    for num, el in enumerate(a, 1):
+        if el == "(" or el == ")":
+            k.append([el, num])
+    a = ud(k)
+    if len(a) == 1:
+        print(a[0][1])
     else:
-      raise CardAlgorithmError('Недействительный номер карты')
-
-
-def process():
-    while True:
-
-        try:
-            number = get_card_number()
-            if luhn_algorithm(number):
-              if random.randint(1, 6) == 5:
-                raise err_server("Ошибка сервера")
-              print("Ваша карта обрабатывается...")
-              break
-            else:
-                print("Номер недействителен. Попробуйте снова.")
-        except CardError as e:
-            print('Ошибка!', e)
-
-
-process()
+        print(-1)
