@@ -60,34 +60,31 @@ def n27(name):
     with open(name) as f:
         n = f.readline()
         a = list(map(int, f))
-        b = list(filter(lambda x: x%2 == 1, a))
-        def f(nech, m):
-            if len(nech)%10 == 0:
-                return m
+        l = len(list(filter(lambda x:x%2 == 1, a)))%10
+        summa = sum(a)
+        left = []
+        k = 0
+        for i in range(len(a)):
+            k+=a[i]
+            if a[i]%2 == 1:
+                left.append(k)
+                k = 0
+                if  len(left) == l:
+                    break
+        right = []
+        for i in range(1, len(a)):
+            k+=a[-i]
+            if a[-i]%2 == 1:
+                right.append(k)
+                k = 0
+                if len(right) == l:
+                    break
+        for i in range(l):
+            if left[i] > right[i]:
+                summa -=right[i]
             else:
-                c = m[::-1]
-                r, l = 0, 0
-                rk, lk = 0, 0
-                for i in range(len(m)):
-                    if m[i]%2 == 0:
-                        r+=m[i]
-                        rk+=1
-                    else:
-                        r+=m[i]
-                        rk+=1
-                        break
-                for i in range(len(c)):
-                    if c[i]%2 == 0:
-                        l+=c[i]
-                        lk+=1
-                    else:
-                        l+=c[i]
-                        lk+=1
-                        break
-                if r>=l:
-                    return f(nech[:-1], m[:-lk])
-                else:
-                    return f(nech[1:], m[rk:])
-        print(sum(f(b, a)))
-n27("27-A.txt")#4767652
+                summa-=left[i]
+        print(summa)
+
+n27("27-A.txt")#4777208
 n27("27-B.txt")#979268310
