@@ -1,60 +1,57 @@
-import math
+class derevo:
+    def __init__(self):
+        self.item = []
+        self.kol = 0
+    def ad(self, it, num = 0, k = []):
+        if num == 0:
+            self.kol+=1
+            self.ad(it, num+1, self.item)
+        else:
+            if num == len(it):
+                t = True
+                for i in range(len(k)):
+                    if k[i]["name"] == it[:num]:
+                        k[i]["num"] = k[i]["num"]+[self.kol]
+                        t = False
+                        break
+                if t:
+                    k.append({"name": it[:num], "items":[], "num":[self.kol]})
+                return k
+            else:
+                t = True
+                for i in range(len(k)):
+                    if k[i]["name"] == it[:num]:
+                        k[i]["items"] = self.ad(it, num+1, k[i]["items"])
+                        k[i]["num"] = k[i]["num"]+[self.kol]
+                        t = False
+                        break
+                if t:
+                    k.append({"name": it[:num], "items": self.ad(it, num+1, []), "num": []})
+                return k
 
-def n27(name):
-    with open(name) as f:
-        n = f.readline()
-        a = list(map(int, f))
-        l = len(list(filter(lambda x:x%2 == 1, a)))%10
-        summa = sum(a)
-        left = []
-        k = 0
-        for i in range(len(a)):
-            k+=a[i]
-            if a[i]%2 == 1:
-                left.append(k)
-                k = 0
-                if len(left) == l:
-                    break
-        right = []
-        for i in range(1, len(a)):
-            k+=a[-i]
-            if a[-i]%2 == 1:
-                right.append(k)
-                k = 0
-                if len(right) == l:
-                    break
-        msx_sum = 0
-        for i in range(l+1):
-            if summa-sum(right[i:])-sum(left[:i])>msx_sum:
-                msx_sum = summa-sum(right[i:])-sum(left[:i])
+    def fiend(self, it, num = 0, k = []):
+        if num == 0:
+            return self.fiend(it, num+1, self.item)
+        else:
+            if len(it) == num:
+                for i in range(len(k)):
+                    if k[i]["name"] == it:
+                        if k[i]["num"] == []:
+                            return -1
+                        return max(k[i]["num"])
+                return -1
+            for i in range(len(k)):
+                if k[i]["name"] == it[:num]:
+                    return self.fiend(it, num+1, k[i]["items"])
 
-        print(msx_sum)
-n27("27-A.txt")#4777208
-n27("27-B.txt")#979268310
-
-def n27(name):
-    with open(name) as f:
-        n = f.readline()
-        a = []
-        for i in f:
-            a.append(list(map(int, i.split())))
-        a = list(map(lambda x: [x[0],math.ceil(x[1]/36)], a))
-
-        ls, rs = 0, 0
-        right, left = 0, 0
-        for i in range(1, len(a)):
-            rs+=a[i][1]
-            right += abs(a[0][0]-a[i][0])* a[i][1]
-
-        mini = right
-        for i in range(1, len(a)):
-            right-=abs(a[i-1][0]-a[i][0])*rs
-            ls +=a[i-1][1]
-            left += ls*abs(a[i-1][0]-a[i][0])
-            rs -=a[i][1]
-            if right+left<mini:
-                mini = right+left
-        print(mini)
-n27("27_A.txt")#51063
-n27("27_B.txt")#5634689219329
-
+d = derevo()
+n, q = map(int, input().split())
+while n > 0:
+    d.ad(input())
+    n-=1
+a = []
+while q > 0:
+    a.append(input().split()[1])
+    q-=1
+for i in range(len(a)):
+    print(d.fiend(a[i]))
