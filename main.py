@@ -1,3 +1,4 @@
+#лес
 a = int(input())
 b = int(input())
 c = int(input())
@@ -50,3 +51,16 @@ else:
             s+=cor[0]
             break
     print(s)
+#кинотеатр
+n = int(input())
+k = int(input())
+if k%(2*n+1) == 0:
+    print(k//(2*n+1)*2, n+1)
+elif k%(2*n+1) >n:
+    r = k//(2*n+1)*2+2
+    pr = k//(2*n+1)*(2*n+1)+n
+    print(r, k - pr)
+else:
+    r = k//(2*n+1)*2+1
+    pr = k//(2*n+1)*(2*n+1)
+    print(r, k-pr)
