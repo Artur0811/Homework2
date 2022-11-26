@@ -1,66 +1,27 @@
-#лес
-a = int(input())
-b = int(input())
-c = int(input())
-d = int(input())
-k = int(input())
+#большое число
+def number():
+    n = "9"*199090+"0"*10+"1"*900
+    k = int(input())
+    num = {i:n.count(str(i)) for i in range(10)}
+    for i in num:
+        a = num[i]
+        if k > a:
+            k-=a
+            n =n.replace(str(i), "")
+        else:
+            n = n.replace(str(i), "", k)
+            break
+    print(n)
 
-if k+a> 2*k:
-    print(k)
-elif k + b > 2 * k:
-    print(k+a)
-elif k+a-c< 0:
-    print(a+a+k+b)
-elif k+b-d<0:
-    print(b+b+k+a+c)
-else:
-    s = 0
-    dx = b-d
-    dy = a-c
-    m = []
-    if dx!=0:
-        m+=[(2*k-d)//abs(dx), d//abs(dx)]
-    if dy!=0:
-        m+=[(2*k-a)//abs(dy), c//abs(dy)]
-    col = min(m)-1
-    s+=col*(a+b+c+d)
-    cor=[k+dx*col, k+dy*col]
-    while True:
-        if cor[1] + a <= 2*k:
-            cor[1] += a
-            s+=a
-        else:
-            s+=2*k-cor[1]
-            break
-        if cor[0] + b <= 2*k:
-            s+=b
-            cor[0] += b
-        else:
-            s+=2*k-cor[0]
-            break
-        if cor[1] - c >= 0:
-            s+=c
-            cor[1] -=c
-        else:
-            s+=cor[1]
-            break
-        if cor[0] - d >= 0:
-            s+=d
-            cor[0]-=d
-        else:
-            s+=cor[0]
-            break
-    print(s)
-#кинотеатр
 n = int(input())
-k = int(input())
-if k%(2*n+1) == 0:
-    print(k//(2*n+1)*2, n+1)
-elif k%(2*n+1) >n:
-    r = k//(2*n+1)*2+2
-    pr = k//(2*n+1)*(2*n+1)+n
-    print(r, k - pr)
-else:
-    r = k//(2*n+1)*2+1
-    pr = k//(2*n+1)*(2*n+1)
-    print(r, k-pr)
+m = [int(input()) for i in range(n)]
+t = False
+for i in range(1, n):
+    for y in range(i+1, n):
+        a= sorted([sum(m[:i]), sum(m[i:y]), sum(m[y:])])
+        if a[1]>0 and a[2] > 0:
+            print(i, y-i, n-y)
+            t = True
+            break
+    if t:
+        break
