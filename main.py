@@ -1,58 +1,49 @@
-#большое число
-def number():
-    n = "9"*199090+"0"*10+"1"*900
-    k = int(input())
-    num = {i:n.count(str(i)) for i in range(10)}
-    for i in num:
-        a = num[i]
-        if k > a:
-            k-=a
-            n =n.replace(str(i), "")
-        else:
-            n = n.replace(str(i), "", k)
-            break
-    print(n)
+def nado():
+    from PIL import Image
+    from astropy.io import fits
+    import matplotlib.pyplot as plt
+    def color_image(data):
+        color = Image.new("RGB", (1241, 1241), 'white')
+        for i in range(len(data)):
+            image_data = fits.getdata(data[i])
+            plt.figure(figsize=(20, 20))
+            plt.imshow(image_data, cmap='gray')
+            plt.colorbar()
+            name = data[i] + '.png'
+            plt.savefig(name)
+            image = Image.open(name)
+            image = image.crop((250, 390, 1491, 1631))
+            pixels = image.load()
+            color_p = color.load()
+            for y in range(image.size[0]):
+                for x in range(image.size[1]):
+                    zn = color_p[y, x]
+                    if i == 0:
+                        zn = (pixels[y, x][i], 1, 1)
+                    elif i == 1:
+                        zn = (zn[0], pixels[y, x][i], 1)
+                    else:
+                        zn = (zn[0], zn[1], pixels[y, x][i])
+                    color_p[y, x] = zn
+        color.show()
+        color.save("color.png")
 
-n = int(input())
-m = [int(input()) for i in range(n)]
-p = [0]*n
-p[0] = m[0]
-mp = []
-for i in range(1, n):
-    if p[i-1] > 0 and m[i] > 0:
-        p[i] = m[i]
-        mp.append(i)
-    elif m[i]<= 0 and p[i-1] + m[i] > 0:
-        p[i] = m[i] + p[i-1]
-    elif p[i-1] > 0 and p[i-1] + m[i]<= 0:
-        p[i] = m[i]
-        mp.append(i)
-    else:
-        p[i] = m[i] + p[i - 1]
-    if len(mp) ==2:
-        break
-ml =[]
-l = [0]*n
-l[-1] = m[-1]
-for i in range(-2, -n-1, -1):
-    if l[i+1]+m[i]>0 and m[i]<0:
-        l[i] = m[i]+l[i+1]
-    elif l[i+1]>0 and l[i+1]+m[i]<=0:
-        l[i] = m[i]
-        ml=[n+i+1]+ml
-    elif l[i+1]>0 and m[i] > 0:
-        l[i] = m[i]
-        ml=[n+i+1]+ml
-    else:
-        l[i] = m[i] + l[i + 1]
-    if len(ml) ==2:
-        break
-if len(mp) == 2:
-    print(mp[0], mp[1]-mp[0], n- mp[1])
-elif len(mp) == 1 and len(ml) == 1:
-    if mp[0] < ml[0]:
-        print(mp[0], ml[0]-mp[0], n - ml[0])
-elif len(ml) == 2:
-    print(ml[0], ml[1] - ml[0], n-ml[1])
-else:
-    print(0)
+t = 1633305600
+m = [0]*(24*7*3600)
+with open("f") as f:
+  n = f.readline()
+  for i in f:
+    a = list(map(int, i.split()))
+    if a[0]<=t and (a[1]>=t+24*7*3600 or a[1] == 0):
+        m = list(map(lambda x:x+1, m))
+    elif t<=a[1]<=t+24*7*3600 and a[0]<= t:
+        for i in range(a[1]-t):
+            m[i]+=1
+    elif t<=a[0]<= t+24*7*3600:
+        if a[1] >= t+24*7*3600 or a[1] == 0:
+            for i in range(len(m)- (a[0]-t)):
+                m[i+a[0]-t]+=1
+        else:
+            for i in range(a[1]- a[0]):
+                m[a[0]-t+i] +=1
+print(max(m), m.count(max(m)))
