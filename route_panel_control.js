@@ -75,6 +75,7 @@ function init() {
 
     menu.appendTo($('body'));
     myMap.geoObjects.add(multiRoute);
-}
+    }); 
 
+}
 ymaps.ready(init);
