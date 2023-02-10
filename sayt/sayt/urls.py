@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", card),
     path("register/", register, name = "register"),
-    path("register/def/", route)
+    path("register/def/", route),
+    path("register/save/", save)
 ]

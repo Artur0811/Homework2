@@ -128,6 +128,13 @@ function init(route) {
         }
     }
     var new_routes = []
+    var rez = {}
+
+    document.getElementById("save").onclick = function () {
+        postData("save/", {rez,   // < here
+            state:"inactive" })
+    }
+
     document.getElementById('gobtn').onclick = function () {
         //console.log(new_routes)//ранее добавленные маршруты
         for(var i = 0, l = new_routes.length; i < l; i++){
@@ -147,7 +154,7 @@ function init(route) {
         //console.log(timeee)//лимит
         // в итоге в ob_poi хранятся обязательные точки. может быть пустым
 
-        var rez = await postData("def/", {"point" : ob_poi,"time": timeee,   // < here
+        rez = await postData("def/", {"point" : ob_poi,"time": timeee,   // < here
             state:"inactive" })
         //console.log(rez)//результат запроса
 

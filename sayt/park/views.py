@@ -16,8 +16,14 @@ def card(request):
     return render(request,"park/card.html")
 def register(request):
     return render(request, "park/register.html")
-def route(request):
 
+def save(request):
+    routes = json.loads(request.body.decode('utf-8'))["rez"]
+    print(routes)#тут json такого вида {'1': ['55.826591, 37.638033', '55.826249, 37.637578'], '2': ['55.826591, 37.638033', '55.828598, 37.633872']}
+    #номер маршрута от 1 до 5 строкой и далее сам маршрут - список поинтов
+    return HttpResponse(request)
+
+def route(request):
     def op_m(a, b):
         if sorted(a[0]) == sorted(b[0]):
             if a[1] < b[1]:
@@ -204,15 +210,4 @@ def route(request):
         return JsonResponse(a)
     if request.method == "POST":
         return JsonResponse(a)
-# def this_server_error(request, template_name='nondefault500.html'):
-#     """
-#     500 error handler.
-#
-#     Templates: `500.html`
-#     Context: sys.exc_info() results
-#      """
-#     t = loader.get_template(template_name) # You need to create a 500.html template.
-#     ltype,lvalue,ltraceback = sys.exc_info()
-#     sys.exc_clear() #for fun, and to point out I only -think- this hasn't happened at
-#                     #this point in the process already
-#     return HttpResponseServerError(t.render(Context({'type':ltype,'value':lvalue,'traceback':ltraceback})))
+
