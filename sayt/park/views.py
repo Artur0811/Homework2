@@ -19,6 +19,7 @@ def register(request):
 
 def save(request):
     routes = json.loads(request.body.decode('utf-8'))["rez"]
+
     print(routes)#тут json такого вида {'1': ['55.826591, 37.638033', '55.826249, 37.637578'], '2': ['55.826591, 37.638033', '55.828598, 37.633872']}
     #номер маршрута от 1 до 5 строкой и далее сам маршрут - список поинтов
     return HttpResponse(request)
@@ -90,7 +91,7 @@ def route(request):
             rez = {}
             ma_l = max(list(map(lambda x: len(x[0]), pu)))  # максимальная длина
             k = 1
-            while ma_l > 0 and len(rez) < 5:  # ищу маршруты
+            while ma_l > 0 and len(rez) < 5: # ищу маршруты
                 a = sorted(filter(lambda x: len(x[0]) == ma_l, pu), key=lambda x: x[1])  # самые длинные
                 ma_l -= 1
                 for i in range(len(a)):

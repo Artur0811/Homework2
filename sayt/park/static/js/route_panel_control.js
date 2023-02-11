@@ -100,7 +100,7 @@ function init(route) {
             });
     }
 
-    menu.appendTo($('body'));
+    menu.appendTo($(document.getElementById("conteyner")));
 
 //    multiRoute = new ymaps.multiRouter.MultiRoute({
 //                        referencePoints: ['55.826591, 37.638033', '55.828794, 37.629733'],
@@ -135,10 +135,19 @@ function init(route) {
             state:"inactive" })
     }
 
+
     document.getElementById('gobtn').onclick = function () {
         //console.log(new_routes)//ранее добавленные маршруты
         for(var i = 0, l = new_routes.length; i < l; i++){
             myMap.geoObjects.remove(new_routes[i])
+        }
+
+        var inf = ["1", "2", "3", "4", "5"]
+        for (var i = 0, l = inf.length; i < l; i++){
+            var el = document.getElementById(inf[i])
+            if (el != null){
+                el.remove()
+            }
         }
 
         async function f(){
@@ -157,7 +166,6 @@ function init(route) {
         rez = await postData("def/", {"point" : ob_poi,"time": timeee,   // < here
             state:"inactive" })
         //console.log(rez)//результат запроса
-
         var fillroute = [["#000088", "#E63E92"], ["#ff9baa", "#E63E92"],["#6a38ff", "#E63E92"],["#0f93ff", "#E63E92"],["#00856f", "#E63E92"]]
         let k = 0
         if(Object.keys(rez).length === 0){
@@ -167,7 +175,7 @@ function init(route) {
                 popup.className = ""
              }
         }
-        for (var i in rez) {
+        for (let i in rez) {
           multiRoute = new ymaps.multiRouter.MultiRoute({
                             referencePoints: rez[i],
                             params: {
@@ -195,9 +203,26 @@ function init(route) {
                             boundsAutoApply: true
                         })
           new_routes.push(multiRoute)
-          k = k+1
           myMap.geoObjects.add(multiRoute)
+          console.log(rez[i])
+          console.log(i)
+          multiRoute.model.events.add("requestsuccess", function (event) {
+                        var routes = event.get("target").getRoutes();
+                        var razn = $("<li "+" id = "+i+"><a>количество точек : "+rez[i].length+" время : "+routes[0].properties.get("duration").text+" длина : "+routes[0].properties.get("distance").text+"</a>"+ "<input type='button' id="+i + "s"+" value='save'/></li>")
+                        razn.appendTo($("body"))
+                        var kn1 = document.getElementById(i+"s")
+                        //console.log(kn1)
+                        if (kn1 != null){
+                            kn1.onclick = function () {
+                                console.log(i)
+                            }
+                        }
+                    }).add("requestfail", function (event) {
+                        console.log("Error: " + event.get("error").message);
+                });
+          k = k+1
         }
+
         }
         f()
     };
