@@ -129,55 +129,22 @@ function init(route) {
     }
     var new_routes = []
     var rez = {}
-
-    document.getElementById("save").onclick = function () {
-        postData("save/", {rez,   // < here
-            state:"inactive" })
-    }
+    var last_route = []
+    let fillroute = [["#000088", "#E63E92"], ["#ff9baa", "#E63E92"],["#6a38ff", "#E63E92"],["#0f93ff", "#E63E92"],["#00856f", "#E63E92"]]
+    let k = 0
 
 
-    document.getElementById('gobtn').onclick = function () {
-        //console.log(new_routes)//ранее добавленные маршруты
-        for(var i = 0, l = new_routes.length; i < l; i++){
-            myMap.geoObjects.remove(new_routes[i])
+    document.getElementById("next").onclick = function () {
+        if (new_routes.length != 0){
+        console.log(new_routes[k].length)
+        myMap.geoObjects.remove(last_route)
+        document.getElementById(String(k)).remove()
+        k = k+1
+        if (k == new_routes.length){
+            k = 0
         }
-
-        var inf = ["1", "2", "3", "4", "5"]
-        for (var i = 0, l = inf.length; i < l; i++){
-            var el = document.getElementById(inf[i])
-            if (el != null){
-                el.remove()
-            }
-        }
-
-        async function f(){
-        var timeee = document.getElementById("time").innerHTML//лимит по времени
-        var inputElements = document.getElementsByClassName('messageCheckbox');//получаю все чекбоксы
-        var ob_poi = []//обязательные точки
-        for(var i = 0, l = inputElements.length; i < l; i++){//рохожусь по чекбоксам
-            if(inputElements[i].checked){//есть галочка - добавляю имя(координаты)
-                ob_poi.push(inputElements[i].name)
-            }
-        }
-        //console.log(ob_poi)//точки
-        //console.log(timeee)//лимит
-        // в итоге в ob_poi хранятся обязательные точки. может быть пустым
-
-        rez = await postData("def/", {"point" : ob_poi,"time": timeee,   // < here
-            state:"inactive" })
-        //console.log(rez)//результат запроса
-        var fillroute = [["#000088", "#E63E92"], ["#ff9baa", "#E63E92"],["#6a38ff", "#E63E92"],["#0f93ff", "#E63E92"],["#00856f", "#E63E92"]]
-        let k = 0
-        if(Object.keys(rez).length === 0){
-             var popup = document.getElementById('popup')
-             popup.classList.toggle('active')
-             window.onclick = function(event) {
-                popup.className = ""
-             }
-        }
-        for (let i in rez) {
-          multiRoute = new ymaps.multiRouter.MultiRoute({
-                            referencePoints: rez[i],
+        multiRoute = new ymaps.multiRouter.MultiRoute({
+                            referencePoints: new_routes[k],
                             params: {
                                 routingMode: 'pedestrian'
                             }
@@ -202,27 +169,112 @@ function init(route) {
                             routeActivePedestrianSegmentStrokeColor: fillroute[k],
                             boundsAutoApply: true
                         })
-          new_routes.push(multiRoute)
           myMap.geoObjects.add(multiRoute)
-          console.log(rez[i])
-          console.log(i)
+          last_route = multiRoute
           multiRoute.model.events.add("requestsuccess", function (event) {
                         var routes = event.get("target").getRoutes();
-                        var razn = $("<li "+" id = "+i+"><a>количество точек : "+rez[i].length+" время : "+routes[0].properties.get("duration").text+" длина : "+routes[0].properties.get("distance").text+"</a>"+ "<input type='button' id="+i + "s"+" value='save'/></li>")
+                        var razn = $("<li "+" id = "+k+"><a>количество точек : "+new_routes[k].length+" время : "+routes[0].properties.get("duration").text+" длина : "+routes[0].properties.get("distance").text+"</a>"+ "<input type='button' id="+k + "s"+" value='save'/></li>")
                         razn.appendTo($("body"))
-                        var kn1 = document.getElementById(i+"s")
+                        var kn1 = document.getElementById(k+"s")
                         //console.log(kn1)
                         if (kn1 != null){
                             kn1.onclick = function () {
-                                console.log(i)
+                                postData("save/", {"rez":new_routes[k],   // < here
+                                    state:"inactive" })
                             }
                         }
                     }).add("requestfail", function (event) {
                         console.log("Error: " + event.get("error").message);
                 });
-          k = k+1
-        }
+    }
+    }
 
+
+    document.getElementById('gobtn').onclick = function () {
+        //console.log(new_routes)//ранее добавленные маршруты
+        myMap.geoObjects.remove(last_route)
+
+
+        var el = document.getElementById(String(k))
+        if (el != null){
+                el.remove()
+            }
+
+
+        async function f(){
+        var timeee = document.getElementById("time").innerHTML//лимит по времени
+        var inputElements = document.getElementsByClassName('messageCheckbox');//получаю все чекбоксы
+        var ob_poi = []//обязательные точки
+        for(var i = 0, l = inputElements.length; i < l; i++){//рохожусь по чекбоксам
+            if(inputElements[i].checked){//есть галочка - добавляю имя(координаты)
+                ob_poi.push(inputElements[i].name)
+            }
+        }
+        //console.log(ob_poi)//точки
+        //console.log(timeee)//лимит
+        // в итоге в ob_poi хранятся обязательные точки. может быть пустым
+
+        rez = await postData("def/", {"point" : ob_poi,"time": timeee,   // < here
+            state:"inactive" })
+        //console.log(rez)//результат запроса
+        if(Object.keys(rez).length === 0){
+             var popup = document.getElementById('popup')
+             popup.classList.toggle('active')
+             window.onclick = function(event) {
+                popup.className = ""
+             }
+        }
+        new_routes = []
+        for (let i in rez) {
+            new_routes.push(rez[i])
+        }
+        k = 0
+        if (new_routes.length != 0){
+        multiRoute = new ymaps.multiRouter.MultiRoute({
+                            referencePoints: new_routes[k],
+                            params: {
+                                routingMode: 'pedestrian'
+                            }
+                        }, {
+                            // Внешний вид путевых точек.
+                            wayPointStartIconColor: "#333",
+                            wayPointStartIconFillColor: "#B3B3B3",
+                            // Позволяет скрыть иконки путевых точек маршрута.
+
+                            // Внешний вид транзитных точек.
+                            viaPointIconRadius: 7,
+                            viaPointIconFillColor: "#000088",
+                            viaPointActiveIconFillColor: "#E63E92",
+                            // Внешний вид линии маршрута.
+                            routeStrokeWidth: 2,
+                            routeStrokeColor: fillroute[k],
+                            routeActiveStrokeWidth: 6,
+                            routeActiveStrokeColor: fillroute[k],
+
+                            // Внешний вид линии пешеходного маршрута.
+                            routeActivePedestrianSegmentStrokeStyle: fillroute[k],
+                            routeActivePedestrianSegmentStrokeColor: fillroute[k],
+                            boundsAutoApply: true
+                        })
+          myMap.geoObjects.add(multiRoute)
+          last_route = multiRoute
+          multiRoute.model.events.add("requestsuccess", function (event) {
+                        var routes = event.get("target").getRoutes();
+                        var razn = $("<li "+" id = "+k+"><a>количество точек : "+new_routes[0].length+" время : "+routes[0].properties.get("duration").text+" длина : "+routes[0].properties.get("distance").text+"</a>"+ "<input type='button' id="+k + "s"+" value='save'/></li>")
+                        razn.appendTo($("body"))
+                        var kn1 = document.getElementById(k+"s")
+                        //console.log(kn1)
+                        if (kn1 != null){
+                            kn1.onclick = function () {
+                                postData("save/", {"rez":new_routes[k],   // < here
+                                    state:"inactive" })
+                            }
+                        }
+                    }).add("requestfail", function (event) {
+                        console.log("Error: " + event.get("error").message);
+                });
+
+        }
         }
         f()
     };
