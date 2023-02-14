@@ -109,11 +109,16 @@ function show_popup(){
              }
 }
 function createinf(sumpoints ,timeroute, lenroute){
+    if (document.getElementById("info") == null){
     var razn = $("<li id = inforoute><a id = info>количество точек : "+sumpoints+" время : "+timeroute+" длина : "+lenroute+"</a>"+ "<input type='button' id=inforoutebtn value='save'/></li>")
     razn.appendTo($("body"))
     var kn1 = document.getElementById("inforoutebtn")
     kn1.onclick = function () {
           postData("save/", {"rez":new_routes[k],state:"inactive" })
+    }
+    }
+    if (document.getElementById("info") != null){
+        document.getElementById("info").innerHTML = "количество точек : "+sumpoints+" время : "+timeroute+" длина : "+lenroute
     }
 }
 
@@ -140,7 +145,8 @@ function addroute(){
     last_route = multiRoute
     multiRoute.model.events.add("requestsuccess", function (event) {
                         var routes = event.get("target").getRoutes();
-                        createinf(new_routes[k].length, routes[k].properties.get("duration").text, routes[0].properties.get("distance").text)
+                        console.log(routes)
+                        createinf(new_routes[k].length, routes[0].properties.get("duration").text, routes[0].properties.get("distance").text)
                     }).add("requestfail", function (event) {
                         console.log("Error: " + event.get("error").message);
                 });
