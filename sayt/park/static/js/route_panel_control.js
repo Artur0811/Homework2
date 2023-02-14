@@ -117,19 +117,8 @@ function createinf(sumpoints ,timeroute, lenroute){
     }
 }
 
-async function createroute(time, points){
-        var rez = {}
-        rez = await postData("def/", {"point" : points,"time": time,state:"inactive" })
-        if(Object.keys(rez).length === 0){
-            show_popup()
-        }
-        new_routes = []
-        for (let i in rez) {
-            new_routes.push(rez[i])
-        }
-        k = 0
-        if (new_routes.length != 0){
-        multiRoute = new ymaps.multiRouter.MultiRoute({
+function addroute(){
+    multiRoute = new ymaps.multiRouter.MultiRoute({
                             referencePoints: new_routes[k],
                             params: {
                                 routingMode: 'pedestrian'
@@ -147,15 +136,29 @@ async function createroute(time, points){
                             routeActivePedestrianSegmentStrokeColor: fillroute[k],
                             boundsAutoApply: true
                         })
-        myMap.geoObjects.add(multiRoute)
-        last_route = multiRoute
-        multiRoute.model.events.add("requestsuccess", function (event) {
+    myMap.geoObjects.add(multiRoute)
+    last_route = multiRoute
+    multiRoute.model.events.add("requestsuccess", function (event) {
                         var routes = event.get("target").getRoutes();
-                        createinf(new_routes[0].length, routes[0].properties.get("duration").text, routes[0].properties.get("distance").text)
+                        createinf(new_routes[k].length, routes[k].properties.get("duration").text, routes[0].properties.get("distance").text)
                     }).add("requestfail", function (event) {
                         console.log("Error: " + event.get("error").message);
                 });
+}
 
+async function createroute(time, points){
+        var rez = {}
+        rez = await postData("def/", {"point" : points,"time": time,state:"inactive" })
+        if(Object.keys(rez).length === 0){
+            show_popup()
+        }
+        new_routes = []
+        for (let i in rez) {
+            new_routes.push(rez[i])
+        }
+        k = 0
+        if (new_routes.length != 0){
+            addroute()
         }
 }
 
@@ -196,30 +199,7 @@ document.getElementById("next").onclick = function () {
         if (k == new_routes.length){
             k = 0
         }
-        multiRoute = new ymaps.multiRouter.MultiRoute({
-                            referencePoints: new_routes[k],
-                            params: {
-                                routingMode: 'pedestrian'
-                            }
-                        }, {
-                            wayPointStartIconColor: "#333",
-                            wayPointStartIconFillColor: "#B3B3B3",
-                            routeStrokeWidth: 2,
-                            routeStrokeColor: fillroute[k],
-                            routeActiveStrokeWidth: 6,
-                            routeActiveStrokeColor: fillroute[k],
-                            routeActivePedestrianSegmentStrokeStyle: fillroute[k],
-                            routeActivePedestrianSegmentStrokeColor: fillroute[k],
-                            boundsAutoApply: true
-                        })
-          myMap.geoObjects.add(multiRoute)
-          last_route = multiRoute
-          multiRoute.model.events.add("requestsuccess", function (event) {
-                        var routes = event.get("target").getRoutes();
-                        document.getElementById("info").innerHTML = "количество точек : "+new_routes[k].length+" время : "+routes[0].properties.get("duration").text+" длина : "+routes[0].properties.get("distance").text
-                    }).add("requestfail", function (event) {
-                        console.log("Error: " + event.get("error").message);
-                });
+        addroute()
     }
     }
 
