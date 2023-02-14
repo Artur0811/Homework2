@@ -145,7 +145,6 @@ function addroute(){
     last_route = multiRoute
     multiRoute.model.events.add("requestsuccess", function (event) {
                         var routes = event.get("target").getRoutes();
-                        console.log(routes)
                         createinf(new_routes[k].length, routes[0].properties.get("duration").text, routes[0].properties.get("distance").text)
                     }).add("requestfail", function (event) {
                         console.log("Error: " + event.get("error").message);
