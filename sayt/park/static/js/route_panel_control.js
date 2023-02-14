@@ -154,23 +154,21 @@ function addroute(){
 async function createroute(time, points){
         var rez = {}
         rez = await postData("def/", {"point" : points,"time": time,state:"inactive" })
-        if(Object.keys(rez).length === 0){
-            show_popup()
-        }
         new_routes = []
+        k = 0
         for (let i in rez) {
             new_routes.push(rez[i])
         }
-        k = 0
         if (new_routes.length != 0){
             addroute()
         }
+        if(Object.keys(rez).length === 0){
+            new_routes.push([-1, -1])
+        }
 }
 
-
-
-
 window.onload = function() {
+
 document.getElementById('gobtn').onclick = function () {
     var el = document.getElementById("inforoute")
         if (el != null){
