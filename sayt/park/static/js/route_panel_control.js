@@ -163,7 +163,7 @@ async function createroute(time, points){
             addroute()
         }
         if(Object.keys(rez).length === 0){
-            new_routes.push([-1, -1])
+            return [[-1, -1]]
         }
 }
 
@@ -183,7 +183,9 @@ document.getElementById('gobtn').onclick = function () {
             }
         }
     myMap.geoObjects.remove(last_route)
-    createroute(timeee, ob_poi)
+    createroute(timeee, ob_poi).then((result) => {
+      console.log(result)
+    })
 }
 
 document.getElementById('desel').onclick = function () {
