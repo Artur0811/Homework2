@@ -22,5 +22,5 @@ urlpatterns = [
     path("", card),
     path("register/", register, name = "register"),
     path("register/def/", route),
-    path("register/save/", save)
+    path("register/save/", save),
 ]

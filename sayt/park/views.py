@@ -12,17 +12,23 @@ from http import HTTPStatus
 import json
 import sqlite3 as sql
 
+
 def card(request):
-    return render(request,"park/card.html")
+    return render(request, "park/card.html")
+
+
 def register(request):
     return render(request, "park/register.html")
+
 
 def save(request):
     routes = json.loads(request.body.decode('utf-8'))["rez"]
 
-    print(routes)#тут json такого вида {'1': ['55.826591, 37.638033', '55.826249, 37.637578'], '2': ['55.826591, 37.638033', '55.828598, 37.633872']}
-    #номер маршрута от 1 до 5 строкой и далее сам маршрут - список поинтов
+    print(
+        routes)  # тут json такого вида {'1': ['55.826591, 37.638033', '55.826249, 37.637578'], '2': ['55.826591, 37.638033', '55.828598, 37.633872']}
+    # номер маршрута от 1 до 5 строкой и далее сам маршрут - список поинтов
     return HttpResponse(request)
+
 
 def route(request):
     def op_m(a, b):
@@ -33,22 +39,22 @@ def route(request):
                 return [b, []]
         return [a, b]
 
-    def o_gr(graf, max_t, x, t_n=0, past=[], ob_p=[]):  # сам граф - graf\ лимит по времени - max_t\ начало графа - x
-        # время на путь - t_n \пройденый путь на данный момент - past\ обязательные точки - ob_p
-        if t_n > max_t or len(
+    def o_gr(graf, max_time, x, time_now=0, past=[], points=[]):  # сам граф - graf\ лимит по времени - max_time\ начало графа - x
+        # время на путь - time_now \пройденый путь на данный момент - past\ обязательные точки - points
+        if time_now > max_time or len(
                 past) == 26:  # если привышен лимит времени и есть 26 точек маршрута (25 - максимальное кол- во точек, которое можно добавить в яндексе)
             b = graf[past[-2]]  # значит заканчиваем
             for i in range(len(b)):
                 if b[i][0] == past[
                     -1]:  # этот цикл для коректировки времени маршрута. последняя точка не должна учитоваться
-                    return [[past[:-1], t_n - b[i][1]]]
-        if past == [] and ob_p == []:  # нет обязательных точек и начала маршрута
+                    return [[past[:-1], time_now - b[i][1]]]
+        if past == [] and points == []:  # нет обязательных точек и начала маршрута
             pu = []
             v = graf[x]  # точки куда могу пойти
             past.append(x)  # начальная точка
             for i in range(len(v)):
-                if t_n + v[i][1] <= max_t:  # перебираю точки в которые могу пойти
-                    a = o_gr(graf, max_t, x, t_n + v[i][1], past + [v[i][0]], ob_p)  # поучаю маршрут
+                if time_now + v[i][1] <= max_time:  # перебираю точки в которые могу пойти
+                    a = o_gr(graf, max_time, x, time_now + v[i][1], past + [v[i][0]], points)  # поучаю маршрут
                     pu += [*a]
             for i in range(len(pu)):  # убираю повторы
                 for y in range(i + 1, len(pu)):  # и если у 2х маршрутов одинаковые точки
@@ -70,24 +76,24 @@ def route(request):
                     if k == 6: return rez
             return rez
 
-        elif past == [] and ob_p != []:  # есть обязательные точки, но нет начала
+        elif past == [] and points != []:  # есть обязательные точки, но нет начала
             past.append(x)  # начало маршрута
             t_p = 0  # предпологаемое время маршрута через обязательные точки
-            while len(ob_p) + 1 != len(
+            while len(points) + 1 != len(
                     past):  # тут типо делаю маршрут из обязательных точек,  но самый короткий по времени
                 v = graf[past[-1]]  # предыдущая точка
                 mi = ["", 1000]  # ближайшая следующая
                 for i in range(len(v)):  # ищу ближайшую обязательную  точку
-                    if mi[1] > v[i][1] and v[i][0] not in past and v[i][0] in ob_p:
+                    if mi[1] > v[i][1] and v[i][0] not in past and v[i][0] in points:
                         mi[1] = v[i][1]
                         mi[0] = v[i][0]
                 t_p += mi[1]  # добавляю время до ближайщей точки
                 past.append(mi[0])  # добавляю ближайшуюточку
-            if t_p > max_t:
+            if t_p > max_time:
                 return {}
             pu = []
             pu.append([past, t_p])  # путь только через обязательные точки
-            pu += o_gr(graf, max_t, x, t_p, past, ob_p)  # остальные маршруты
+            pu += o_gr(graf, max_time, x, t_p, past, points)  # остальные маршруты
             for i in range(len(pu)):  # убираю повторы
                 for y in range(i + 1, len(pu)):  # и если у 2х маршрутов одинаковые точки
                     if pu[i] != [] and pu[y] != []:  # то оставляю тот, который меньше по времени
@@ -99,7 +105,7 @@ def route(request):
             rez = {}
             ma_l = max(list(map(lambda x: len(x[0]), pu)))  # максимальная длина
             k = 1
-            while ma_l > 0 and len(rez) < 5: # ищу маршруты
+            while ma_l > 0 and len(rez) < 5:  # ищу маршруты
                 a = sorted(filter(lambda x: len(x[0]) == ma_l, pu), key=lambda x: x[1])  # самые длинные
                 ma_l -= 1
                 for i in range(len(a)):
@@ -109,7 +115,7 @@ def route(request):
             return rez
 
         else:
-            if ob_p == []:  # не обязательных точек
+            if points == []:  # не обязательных точек
                 mi = ["", 1000]  # ближайшая точ
                 b = graf[past[-1]]  # куда могу пойти
                 for i in range(len(b)):  # ищу ближайшую точку
@@ -117,12 +123,12 @@ def route(request):
                         mi[1] = b[i][1]
                         mi[0] = b[i][0]
                 if mi[1] == 1000:  # на всякий
-                    return [[past, t_n]]
-                return o_gr(graf, max_t, x, t_n + mi[1], past + [mi[0]], ob_p)  # добавляю бижайшую точку и иду дальше
+                    return [[past, time_now]]
+                return o_gr(graf, max_time, x, time_now + mi[1], past + [mi[0]], points)  # добавляю бижайшую точку и иду дальше
             else:  # есть обязательные точки
                 pu = []
                 if len(past) == 25:
-                    return [[past, t_n]]
+                    return [[past, time_now]]
                 mi = ["", 10000, 0]  # ищу точку кторая увеличит время меньше всего
                 for i in range(1, len(past)):  # рассматриваю разные звенья пути(А, Б)
                     g = graf[past[i - 1]]
@@ -142,19 +148,18 @@ def route(request):
                                 mi[0] = g[y][0]
                                 mi[1] = d_t - t
                                 mi[2] = i
-                if max_t >= t_n + mi[1] and mi[1] != 10000:  # не превзашол лимит по времени
-                    pu.append([past[:mi[2]] + [mi[0]] + past[mi[2]:], t_n + mi[1]])  # сохраняю маршрут
-                    pu += o_gr(graf, max_t, x, t_n + mi[1], past[:mi[2]] + [mi[0]] + past[mi[2]:],
-                               ob_p)  # проверяю могу ли добавить еще точки
-                    pu += o_gr(graf, max_t, x, t_n + mi[1],
+                if max_time >= time_now + mi[1] and mi[1] != 10000:  # не превзашол лимит по времени
+                    pu.append([past[:mi[2]] + [mi[0]] + past[mi[2]:], time_now + mi[1]])  # сохраняю маршрут
+                    pu += o_gr(graf, max_time, x, time_now + mi[1], past[:mi[2]] + [mi[0]] + past[mi[2]:],
+                               points)  # проверяю могу ли добавить еще точки
+                    pu += o_gr(graf, max_time, x, time_now + mi[1],
                                past[:mi[2]] + [mi[0]] + past[mi[2]:])  # маршрут за самую крайнюю обязательную точку
                 return pu  # вывод
 
     s = {}
     con = sql.connect("db.sqlite3")  # подключаюсь к базе данных
     cur = con.cursor()  # ну это наверное нужно
-    cur.execute(
-        'SELECT point1, point2 FROM route')  # таблица routeолучаю из нее значения точки(point1) и куда можно пойти(point2)
+    cur.execute('SELECT point1, point2 FROM route')  # таблица routeолучаю из нее значения точки(pointsnt1) и куда можно пойти(pointsnt2)
     for i in cur:  # проход по данным
         po = i[0]  # точка
         zn = i[1].split(";")  # пути хранятся как строка 1 значение - точка 2- время ;- разделитель
@@ -166,8 +171,8 @@ def route(request):
     cur.close()
     con.close()  # отключаю подключение
     ti = json.loads(request.body.decode('utf-8'))
-    poi = list(map(lambda x: x.split(",")[0] +", "+ x.split(",")[1],ti['point']))
-    points = [
+    points = list(map(lambda x: x.split(",")[0] + ", " + x.split(",")[1], ti['point']))
+    coordinates = [
         "55.826591, 37.638033",
         "55.828598, 37.633872",
         "55.828660, 37.631427",
@@ -207,16 +212,17 @@ def route(request):
         "55.833797, 37.623099",
         "55.834308, 37.623085"
     ]
-    for i in range(len(poi)):
-        a = poi[i].split(",")
-        for y in range(len(points)):
-            if a[0] in points[y] and a[1] in points[y]:
-                poi[i] = points[y]
+    for i in range(len(points)):
+        a = points[i].split(",")
+        for y in range(len(coordinates)):
+            if a[0] in coordinates[y] and a[1] in coordinates[y]:
+                points[i] = coordinates[y]
 
     ti = int(ti['time'])
-    a = o_gr(s, ti, "55.826591, 37.638033", ob_p=poi)
+    a = o_gr(s, ti, "55.826591, 37.638033", points=points)
     if request.method == "GET":
         return JsonResponse(a)
     if request.method == "POST":
         return JsonResponse(a)
+
 
