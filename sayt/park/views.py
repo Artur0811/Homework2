@@ -137,17 +137,12 @@ def route(request):
                             pr = graf[g[y][0]]
                             for j in pr:
                                 if j[0] == past[i]:
-                                    if delta_lenpoint+j[1] - lenpoint == -620:
-                                        print(g[y][0], j[0], j[1])
-                                    if delta_lenpoint+j[1] - lenpoint == -500:
-                                        print(g[y][0], j[0], j[1])
                                     delta_lenpoint += j[1]
                                     break
                             if mi[1] > delta_lenpoint - lenpoint:
                                 mi[0] = g[y][0]
                                 mi[1] = delta_lenpoint - lenpoint
                                 mi[2] = i
-                                print(mi, past[i-1], g[y][0], past[i])
                 if max_time >= round((lenroute + mi[1])/83) and mi[1] != 10000:
                     pu.append([past[:mi[2]] + [mi[0]] + past[mi[2]:], round((lenroute + mi[1])/83)])
                     pu += o_gr(graf, max_time, x, lenroute + mi[1], past[:mi[2]] + [mi[0]] + past[mi[2]:],
