@@ -30,7 +30,7 @@ const csrftoken = getCookie('csrftoken');
 
 let new_routes = []
 let last_route = []
-let fillroute = [["#000088", "#E63E92"], ["#ff9baa", "#E63E92"],["#6a38ff", "#E63E92"],["#0f93ff", "#E63E92"],["#00856f", "#E63E92"]]//цвета маршрутов
+let fillroute = ["#000088", "#E63E92"]
 let k = 0
 
 function init(route) {
@@ -75,10 +75,10 @@ function init(route) {
         }
     }
     function createSubMenu (item, collection, submenu) {
-        if (item.center == '55.826591,37.638033'){
+        if (item.center == '55.826249,37.637578'){
         var submenuItem = $('<li><a href="#">' + item.name +'</a>' + "</li>")
         }
-        if (item.center != '55.826591,37.638033'){
+        if (item.center != '55.826249,37.637578'){
         var submenuItem = $('<li><a href="#">' + item.name +'</a>' + '<input class="messageCheckbox" type="checkbox" name=' + item.center+'><span class="checkmark" ></span>' + "</li>")
         }
         var placemark = new ymaps.Placemark(item.center, { balloonContent: item.name });
@@ -133,12 +133,12 @@ function addroute(){
                             wayPointStartIconFillColor: "#B3B3B3",
 
                             routeStrokeWidth: 2,
-                            routeStrokeColor: fillroute[k],
+                            routeStrokeColor: fillroute,
                             routeActiveStrokeWidth: 6,
-                            routeActiveStrokeColor: fillroute[k],
+                            routeActiveStrokeColor: fillroute,
 
-                            routeActivePedestrianSegmentStrokeStyle: fillroute[k],
-                            routeActivePedestrianSegmentStrokeColor: fillroute[k],
+                            routeActivePedestrianSegmentStrokeStyle: fillroute,
+                            routeActivePedestrianSegmentStrokeColor: fillroute,
                             boundsAutoApply: true
                         })
     myMap.geoObjects.add(multiRoute)
@@ -146,6 +146,9 @@ function addroute(){
     multiRoute.model.events.add("requestsuccess", function (event) {
                         var routes = event.get("target").getRoutes();
                         createinf(new_routes[k].length, routes[0].properties.get("duration").text, routes[0].properties.get("distance").text)
+                        console.log("Route time " + ": " + routes[0].properties.get("duration").text)
+                        console.log("Route length "  + ": " + routes[0].properties.get("distance").text)
+                        console.log(new_routes[k][0],new_routes[k][1] )
                     }).add("requestfail", function (event) {
                         console.log("Error: " + event.get("error").message);
                 });
@@ -183,9 +186,7 @@ document.getElementById('gobtn').onclick = function () {
             }
         }
     myMap.geoObjects.remove(last_route)
-    createroute(timeee, ob_poi).then((result) => {
-      console.log(result)
-    })
+    createroute(timeee, ob_poi)
 }
 
 document.getElementById('desel').onclick = function () {

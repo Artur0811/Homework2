@@ -23,9 +23,7 @@ def register(request):
 
 def save(request):
     routes = json.loads(request.body.decode('utf-8'))["rez"]
-
-    print(routes)  # тут json такого вида {'1': ['55.826591, 37.638033', '55.826249, 37.637578'], '2': ['55.826591, 37.638033', '55.828598, 37.633872']}
-    # номер маршрута от 1 до 5 строкой и далее сам маршрут - список поинтов
+    print(routes)
     return HttpResponse(request)
 
 
@@ -124,6 +122,7 @@ def route(request):
                 pu = []
                 if len(past) == 25:
                     return [[past, lenroute]]
+                point1, point2 = "", ""
                 mi = ["", 10000, 0]
                 for i in range(1, len(past)):
                     g = graf[past[i - 1]]
@@ -137,6 +136,8 @@ def route(request):
                             pr = graf[g[y][0]]
                             for j in pr:
                                 if j[0] == past[i]:
+                                    if g[y][0] == "55.833743, 37.631765":
+                                        print([past[i-1], "55.833743, 37.631765", past[i]], delta_lenpoint, j[1])
                                     delta_lenpoint += j[1]
                                     break
                             if mi[1] > delta_lenpoint - lenpoint:
@@ -174,6 +175,8 @@ def route(request):
                 points[i] = coordinates[y]
 
     ti = int(ti['time'])
+    for i in s:
+        print(len(s[i]), i)
     a = o_gr(s, ti, "55.826249, 37.637578", points=points)
     if request.method == "GET":
         return JsonResponse(a)
