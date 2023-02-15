@@ -215,5 +215,3 @@ document.getElementById("next").onclick = function () {
         output.innerHTML = this.value;
     }
 };
-
-
