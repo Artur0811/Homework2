@@ -49,77 +49,62 @@ def route(request):
                 return [b, []]
         return [a, b]
 
+    def convert_s(data):
+        for i in range(len(data)):
+            for y in range(i + 1, len(data)):
+                if data[i] != [] and data[y] != []:
+                    if len(data[i][0]) == len(data[y][0]):
+                        c = op_m(data[i], data[y])
+                        data[i] = c[0]
+                        data[y] = c[1]
+        pu = list(filter(lambda x: x != [], data))
+        ma_l = max(list(map(lambda x: len(x[0]), pu)))
+        rez = {}
+        k = 1
+        while ma_l > 0:
+            a = list(filter(lambda x: len(x[0]) == ma_l, pu))
+            ma_l -= 1
+            for i in range(len(a)):
+                rez[str(k)] = a[i][0]
+                k += 1
+                if k == 11: return rez
+        return rez
+
     def o_gr(graf, max_time, x, lenroute=0, past=[], points=[]):
-        if round(lenroute/83) > max_time or len(
-                past) == 26:
-            b = graf[past[-2]]
-            for i in range(len(b)):
-                if b[i][0] == past[-1]:
-                    return [[past[:-1], round((lenroute - b[i][1])/83)]]
+        if round(lenroute / 83) > max_time or len(past) == 26:
+            last = graf[past[-2]]
+            for i in range(len(last)):
+                if last[i][0] == past[-1]:
+                    return [[past[:-1], round((lenroute - last[i][1]) / 83)]]
         if past == [] and points == []:
             pu = []
-            v = graf[x]
+            variants = graf[x]
             past.append(x)
-            for i in range(len(v)):
-                if round((lenroute + v[i][1])/83) <= max_time:
-                    a = o_gr(graf, max_time, x, lenroute + v[i][1], past + [v[i][0]], points)
+            for i in range(len(variants)):
+                if round((lenroute + variants[i][1]) / 83) <= max_time:
+                    a = o_gr(graf, max_time, x, lenroute + variants[i][1], past + [variants[i][0]], points)
                     pu += [*a]
-            for i in range(len(pu)):
-                for y in range(i + 1, len(pu)):
-                    if pu[i] != [] and pu[y] != []:
-                        if len(pu[i][0]) == len(pu[y][0]):
-                            c = op_m(pu[i], pu[y])
-                            pu[i] = c[0]
-                            pu[y] = c[1]
-            pu = list(filter(lambda x: x != [], pu))
-            ma_l = max(list(map(lambda x: len(x[0]), pu)))
-            rez = {}
-            k = 1
-            while ma_l > 0:
-                a = list(filter(lambda x: len(x[0]) == ma_l, pu))
-                ma_l -= 1
-                for i in range(len(a)):
-                    rez[str(k)] = a[i][0]
-                    k += 1
-                    if k == 6: return rez
-            return rez
+            return convert_s(pu)
 
         elif past == [] and points != []:
             past.append(x)
             estimated_length = 0
             while len(points) + 1 != len(past):
-                v = graf[past[-1]]
+                variants = graf[past[-1]]
                 mi = ["", 10000]
-                for i in range(len(v)):  #
-                    if mi[1] > v[i][1] and v[i][0] not in past and v[i][0] in points:
-                        mi[1] = v[i][1]
-                        mi[0] = v[i][0]
+                for i in range(len(variants)):
+                    if mi[1] > variants[i][1] and variants[i][0] not in past and variants[i][0] in points:
+                        mi[1] = variants[i][1]
+                        mi[0] = variants[i][0]
                 estimated_length += mi[1]
                 past.append(mi[0])
-            if round(estimated_length/83) > max_time:
-                return {}
+            if round(estimated_length / 83) > max_time:
+                return False
             pu = []
-            pu.append([past, round(estimated_length/83)])
+            pu.append([past, round(estimated_length / 83)])
             pu += o_gr(graf, max_time, x, estimated_length, past, points)
-            for i in range(len(pu)):
-                for y in range(i + 1, len(pu)):
-                    if pu[i] != [] and pu[y] != []:
-                        if len(pu[i][0]) == len(pu[y][0]):
-                            c = op_m(pu[i], pu[y])
-                            pu[i] = c[0]
-                            pu[y] = c[1]
-            pu = list(filter(lambda x: x != [], pu))
-            rez = {}
-            ma_l = max(list(map(lambda x: len(x[0]), pu)))
-            k = 1
-            while ma_l > 0:
-                a = sorted(filter(lambda x: len(x[0]) == ma_l, pu), key=lambda x: x[1])
-                ma_l -= 1
-                for i in range(len(a)):
-                    rez[str(k)] = a[i][0]
-                    k += 1
-                    if k == 11: return rez
-            return rez
+            pu += o_gr(graf, max_time, x, estimated_length, past)
+            return convert_s(pu)
         else:
             if points == []:
                 mi = ["", 10000]
@@ -129,13 +114,12 @@ def route(request):
                         mi[1] = b[i][1]
                         mi[0] = b[i][0]
                 if mi[1] == 10000:
-                    return [[past, lenroute/83]]
+                    return [[past, lenroute / 83]]
                 return o_gr(graf, max_time, x, lenroute + mi[1], past + [mi[0]], points)
             else:
                 pu = []
                 if len(past) == 25:
                     return [[past, lenroute]]
-                point1, point2 = "", ""
                 mi = ["", 10000, 0]
                 for i in range(1, len(past)):
                     g = graf[past[i - 1]]
@@ -149,16 +133,14 @@ def route(request):
                             pr = graf[g[y][0]]
                             for j in pr:
                                 if j[0] == past[i]:
-                                    if g[y][0] == "55.833743, 37.631765":
-                                        print([past[i-1], "55.833743, 37.631765", past[i]], delta_lenpoint, j[1])
                                     delta_lenpoint += j[1]
                                     break
                             if mi[1] > delta_lenpoint - lenpoint:
                                 mi[0] = g[y][0]
                                 mi[1] = delta_lenpoint - lenpoint
                                 mi[2] = i
-                if max_time >= round((lenroute + mi[1])/83) and mi[1] != 10000:
-                    pu.append([past[:mi[2]] + [mi[0]] + past[mi[2]:], round((lenroute + mi[1])/83)])
+                if max_time >= round((lenroute + mi[1]) / 83) and mi[1] != 10000:
+                    pu.append([past[:mi[2]] + [mi[0]] + past[mi[2]:], round((lenroute + mi[1]) / 83)])
                     pu += o_gr(graf, max_time, x, lenroute + mi[1], past[:mi[2]] + [mi[0]] + past[mi[2]:],
                                points)
                     pu += o_gr(graf, max_time, x, lenroute + mi[1],
@@ -186,7 +168,7 @@ def route(request):
     ti = int(ti['time'])
     for i in s:
         print(len(s[i]), i)
-    a = o_gr(s, ti, "55.826249, 37.637578", points=points)
+    a = o_gr(s, ti, "55.828598, 37.633872", points=points)
     if request.method == "GET":
         return JsonResponse(a)
     if request.method == "POST":
