@@ -1,90 +1,204 @@
-def n26_1():
-    s = {}
-    with open("f.txt") as f:
-        n = f.readline()
-        for i in f:
-            a,b = map(int, i.split())
-            if a not in s:
-                s[a] = [b]
-            else:
-                v = s[a]
-                v.append(b)
-                v =sorted(v)
-                s[a] = v
-    ma, m = 0, 0
-    for i in s:
-        v = s[i]
-        for y in range(len(v)-1):
-            if v[y+1]-v[y] == 3:
-                if i > ma:
-                    ma = i
-                    m = v[y]+1
-                break
-    print(ma, m)#8631 7311
+a = [
+    {
+        'id': 123,
+        'form': [[1, 0],
+                 [1, 1]]
+    },
+    {
+        'id': 231,
+        'form': [[1, 1],
+                 [0, 1]]
+    },
+]
 
-def n26_2():
-    with open("f.txt") as f:
-        s, n = map(int, f.readline().split())
-        a = sorted(map(int, f))
-        k,ma = 0, 0
-        for i in range(len(a)):
-            if s - a[i] >= 0:
-                s-=a[i]
-                k+=1
-                ma= a[i]
-            else:
-                break
-        ma +=s
-        while ma not in a:
-            ma-=1
-        print(k, ma)#729 23
+res = [
+    {
+        'id': 123,
+        'pos': 1,
+        'reverse': True
+    }
+]
 
-def n27_1():
-    with open("f.txt") as f:
-        n = f.readline()
-        a = list(map(int, f))
-        su = sum(a)
-        r = []
-        r.append(a[0])
-        for i in range(1, len(a)):
-            r.append(r[-1] + a[i])
-        l = []
-        l.append(a[-1])
-        for i in range(-2, -len(a)-1, -1):
-            l = [l[0]+a[i]] + l
-        k = len(list(filter(lambda x : x%999 == 0, a)))
-        for i in range(0, len(a)):
-            for y in range(i+1, len(a)):
-                s = su - r[i] - l[y]+a[i]+a[y]
-                if s%999 == 0:
-                    k+=1
-        print(k)#a- 403
+blocks = [
+    {
+        "id": 443,
+        "form": [
+            [1, 0, 1],
+            [1, 1, 1]
+        ]
+    },
+    {
+        "id": 327,
+        "form": [
+            [0, 1, 0],
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
+    },
+    {
+        "id": 891,
+        "form": [
+            [0, 0, 1],
+            [1, 0, 1],
+            [1, 1, 1]
+        ]
+    },
+    {
+        "id": 4431,
+        "form": [
+            [1, 0, 1],
+            [1, 1, 1]
+        ]
+    },
+    {
+        "id": 3271,
+        "form": [
+            [0, 1, 0],
+            [1, 1, 1],
+            [1, 1, 1],
+            [1, 1, 0],
+            [0, 1, 0]
+        ]
+    },
+    {
+        "id": 8911,
+        "form": [
+            [0, 0, 1],
+            [1, 0, 1],
+            [1, 1, 1]
+        ]
+    }
+]
 
-with open("f.txt") as f:
-    n = f.readline()
-    d1 = []
-    d2 = []
-    s = 0
-    for i in f:
-        a, b= map(int, i.split())
-        s+=min(a, b)
-        if abs(a-b)%3 == 1:
-            d1.append(abs(a-b))
-        if abs(a-b)%3 == 2:
-            d2.append(abs(a-b))
-    if s%3 != 0:
-        print(s)
+res = [
+    {
+        'id': 443,
+        'pos': 1,
+        'reverse': False
+    },
+    {
+        'id': 327,
+        'pos': 2,
+        'reverse': True
+    },
+    {
+        'id': 891,
+        'pos': 3,
+        'reverse': True
+    }
+]
+
+bl = [
+    {
+        "id": 991,
+        "form": [
+            [0, 0, 1],
+            [1, 1, 1],
+            [1, 1, 1]
+        ]
+    },
+    {
+        "id": 443,
+        "form": [
+            [1, 0, 1],
+            [1, 0, 1],
+            [1, 1, 1]
+        ]
+    },
+    {
+        "id": 327,
+        "form": [
+            [0, 1, 0],
+            [1, 1, 1],
+            [1, 1, 1],
+            [0, 1, 0],
+            [0, 1, 0]
+        ]
+    },
+    {
+        "id": 891,
+        "form": [
+            [1, 0, 1],
+            [1, 1, 1],
+            [1, 1, 0]
+        ]
+    }
+]
+
+def connection(block, pat):
+    for i in range(len(pat)+1):
+        if i == len(pat):
+            if i < len(block):
+                if 0 in block[i]:
+                    return False
+        else:
+            if pat[i] != block[i]:
+                return False
+    return True
+
+def tetris(blocks, res = [], start = False, end = False, pat = []):
+    if len(blocks) == 0:
+        return res
+    if start:
+        for i in range(len(blocks)):
+            b = blocks[i]
+            f = b["form"]
+            revers = False
+            if 0 not in f[-1]:
+                revers = True
+                f = f[::-1]
+            if 0 not in f[0]:
+                p = []
+                res.append({"id": b["id"], "pos": len(blocks), "revers":revers})
+                for y in range(len(f)):
+                    if 0 in f[y]:
+                        a = []
+                        for z in range(len(f[y])):
+                            if f[y][z] == 0:
+                                a.append(1)
+                            else:
+                                a.append(0)
+                        p.append(a)
+                blocks = blocks[:i] + blocks[i+1:]
+                return tetris(blocks, res, pat = p)
     else:
-        d1 =sorted(d1)
-        d2 =sorted(d2)
-        m =[]
-        if len(d1) >1:
-            m.append(s+d1[0]+d1[1])
-        if len(d2) > 0:
-            m.append(s+d2[0])
-        if len(d1) > 0:
-            m.append(s+d1[0])
-        if len(d2) > 1:
-            m.append(s+ d2[0]+d2[1])
-        print(min(m))
-        #a - 67088 b - 200157478
+        for i in range(len(blocks)):
+            b = blocks[i]
+            f = b["form"]
+            if connection(f, pat):
+                f = f[len(pat)+1:]
+                p = []
+                for y in range(len(f)):
+                    if 0 in f[y]:
+                        a = []
+                        for z in range(len(f[y])):
+                            if f[y][z] == 0:
+                                a.append(1)
+                            else:
+                                a.append(0)
+                        p.append(a)
+                res.append({"id": b["id"], "pos": len(blocks), "revers": False})
+                blocks = blocks[:i] + blocks[i+1:]
+                return tetris(blocks, res, pat = p)
+            elif connection(f[::-1], pat):
+                f = f[::-1][len(pat) + 1:]
+                p = []
+                for y in range(len(f)):
+                    if 0 in f[y]:
+                        a = []
+                        for z in range(len(f[y])):
+                            if f[y][z] == 0:
+                                a.append(1)
+                            else:
+                                a.append(0)
+                        p.append(a)
+                res.append({"id": b["id"], "pos": len(blocks), "revers": True})
+                blocks = blocks[:i] + blocks[i + 1:]
+                return tetris(blocks, res, pat=p)
+        return [{"id": -1, "pos": -1, "revers": -1}]
+
+t = tetris(bl, start=True)
+for i in t:
+    print(i)
