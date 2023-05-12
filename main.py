@@ -1,40 +1,23 @@
-with open("f.txt") as f:
-    n = f.readline()
-    a = list(map(int, f))
-    l, r = 0 , 0
-    sl, sr = 0, 0
-    if len(a)%2 == 0:
-      ser = len(a)//2
-    else:
-      ser = len(a)//2+1
-    for i in range(1, ser):
-        r += a[i]
-        sr += a[i]*i
-    if len(a)%2 == 0:
-      ser = len(a)//2
-    else:
-      ser = len(a)//2
-    for i in range(-ser, 0):
-        l += a[i]
-        sl -= i*a[i]
-    mi = sr + sl
-    v  = 1
-    for i in range(1, len(a)):
-        sr -= r
-        r -= a[i]
-        l += a[i-1]
-        sl += l
-        if len(a)%2 == 0:
-            sr += a[(i+len(a)//2 -1)%len(a)]*(len(a)//2-1)
-            r += a[(i+len(a)//2 -1)%len(a)]
-            sl -= a[(i+len(a)//2 -1)%len(a)]*(len(a)//2+1)
-            l -= a[(i+len(a)//2 -1)%len(a)]
+m = [1, 4, 6, 8, 2, 1, 19, 8,7,3]
+m1 = [1, 3, 1, 3, 3, 19, 11]
+
+def f(data):
+    if len(data) == 0:
+        return 0
+    if len(data)<=2:
+        return max(data)
+    if len(data) == 3:
+        return max(data[0] + data[2], data[1])
+    data[2] += data[0]
+    res = max(data[:3])
+    for i in range(3, len(data)):
+        if data[i-2] < data[i- 3]:
+            if res < data[i] + data[i-3]:
+                res = data[i] + data[i-3]
+            data[i] += data[i-3]
         else:
-            sr += a[(i + len(a) // 2)%len(a)] * (len(a) // 2)
-            r += a[(i + len(a) // 2)%len(a)]
-            sl -= a[(i + len(a) // 2)%len(a)] * (len(a) // 2+1)
-            l -= a[(i + len(a) // 2)%len(a)]
-        if sr + sl < mi:
-            mi = sr + sl
-            v = i+1
-print(mi)
+            if res < data[i] + data[i-2]:
+                res = data[i] + data[i-2]
+            data[i] += data[i-2]
+    return res
+print(f(m1))
