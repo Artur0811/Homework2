@@ -1,23 +1,33 @@
-m = [1, 4, 6, 8, 2, 1, 19, 8,7,3]
-m1 = [1, 3, 1, 3, 3, 19, 11]
+coins = [1,2,5]
+n = 11
+res = 3
 
-def f(data):
-    if len(data) == 0:
+# coins = [2]
+# n = 3
+# res = -1
+#
+# coins = [1]
+# n = 0
+# res = 0
+
+def f(s, data):
+    if s == 0:
         return 0
-    if len(data)<=2:
-        return max(data)
-    if len(data) == 3:
-        return max(data[0] + data[2], data[1])
-    data[2] += data[0]
-    res = max(data[:3])
-    for i in range(3, len(data)):
-        if data[i-2] < data[i- 3]:
-            if res < data[i] + data[i-3]:
-                res = data[i] + data[i-3]
-            data[i] += data[i-3]
-        else:
-            if res < data[i] + data[i-2]:
-                res = data[i] + data[i-2]
-            data[i] += data[i-2]
-    return res
-print(f(m1))
+    if s%data[-1] == 0:
+        return s//data[-1]
+    m = set(data)
+    mi = min(data)
+    res = []
+    while s > mi:
+        res.append(mi)
+        s-=mi
+        if s in m:
+            res.append(s)
+            break
+    if s not in m:
+        return 0
+    else:
+        res.append(s)
+    print(res)
+f(n, coins)
+
